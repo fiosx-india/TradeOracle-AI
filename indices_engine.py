@@ -45,6 +45,7 @@ class IndicesEngine:
         self.fno_csv = None
         self.load_latest_csv_files()
         self.load_indices_csv()
+        self.load_fno_csv()
 
     def get_all_indices(self) -> Dict[str, IndexData]:
         return self.indices
@@ -110,3 +111,35 @@ class IndicesEngine:
                         "low_price": float(row.get("Low", 0)),
                         "previous_close": float(row.get("Prev Close", 0))
                     })
+
+
+    def load_fno_csv(self):
+
+        self.fno_symbols = []
+
+        if self.fno_csv is None:
+            return
+
+        try:
+
+            with open(
+                self.fno_csv,
+                newline="",
+                encoding="utf-8"
+            ) as file:
+
+                reader = csv.DictReader(file)
+
+                for row in reader:
+
+                    symbol = row.get("SYMBOL")
+
+                    if symbol:
+                        self.fno_symbols.append(symbol.strip())
+
+        except Exception as error:
+
+            print(f"F&O CSV Load Error: {error}")
+
+    def is_fno_symbol(self, symbol: str) -> bool:
+        return symbol in self.fno_symbols
