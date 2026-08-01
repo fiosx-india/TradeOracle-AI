@@ -32,29 +32,14 @@ class NewsAnalysis:
     bearish_score: float = 0.0
 
     recommendation: str = "HOLD"
-    
-class NewsAnalyzer:
 
+
+class NewsAnalyzer:
     def __init__(self):
         self.news: List[NewsItem] = []
 
-    def add_news(
-        self,
-        title,
-        source,
-        category,
-        sentiment,
-        impact_score
-    ):
-        self.news.append(
-            NewsItem(
-                title,
-                source,
-                category,
-                sentiment,
-                impact_score
-            )
-        )
+    def add_news(self, title, source, category, sentiment, impact_score):
+        self.news.append(NewsItem(title, source, category, sentiment, impact_score))
 
     def analyze(self):
 
@@ -70,7 +55,7 @@ class NewsAnalyzer:
         for item in self.news:
 
             score += item.impact_score
-            
+
             if item.sentiment.upper() == "POSITIVE":
                 positive += 1
                 result.bullish_score += item.impact_score
