@@ -121,9 +121,21 @@ class IndicesEngine:
 
                 for row in reader:
 
-                    symbol = (row.get("Symbol") or "").strip()
+                    index_name = (row.get("INDEX") or "").strip()
 
-                    if symbol not in self.indices:
+                    index_map = {
+                        "NIFTY 50": "NIFTY",
+                        "NIFTY BANK": "BANKNIFTY",
+                        "NIFTY FINANCIAL SERVICES": "FINNIFTY",
+                        "NIFTY MIDCAP SELECT": "MIDCAP",
+                        "INDIA VIX": "INDIAVIX",
+                        "S&P BSE SENSEX": "SENSEX",
+                        "S&P BSE BANKEX": "BANKEX",
+                    }
+
+                    symbol = index_map.get(index_name)
+
+                    if symbol is None:
                         continue
 
                     self.update_index(
