@@ -42,7 +42,12 @@ class TradeOracle:
             print("Bearish :", report.bearish_score)
             print("Market Score :", report.market_score)
             print("News :", news_report.overall_sentiment)
-
+            print("Last Price :", market_data[symbol].last_price)
+            print("Open Price :", market_data[symbol].open_price)
+            print("High Price :", market_data[symbol].high_price)
+            print("Low Price :", market_data[symbol].low_price)
+            print("Change % :", market_data[symbol].change_percent)
+            
             signal = self.signal.generate(report, news_report)
 
             results[symbol] = {
