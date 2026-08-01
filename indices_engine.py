@@ -41,13 +41,15 @@ class IndicesEngine:
         }
 
         self.data_folder = Path("data")
+
         self.indices_csv = None
         self.fno_csv = None
+        self.fno_symbols = []
+
         self.load_latest_csv_files()
-        
+
         self.load_indices_csv()
         self.load_fno_csv()
-        self.fno_symbols = []
         
     def get_all_indices(self) -> Dict[str, IndexData]:
         return self.indices
@@ -97,28 +99,51 @@ class IndicesEngine:
     def load_indices_csv(self):
 
         if self.indices_csv is None:
+            print("Indices CSV file not found.")
             return
 
-        with open(self.indices_csv,
-                  newline="",
-                  encoding="utf-8") as file:
+        try:
 
-            reader = csv.DictReader(file)
+            with open(
+                self.indices_csv,
+                mode="r",
+                newline="",
+                encoding="utf-8"
+            ) as file:
 
-            for row in reader:
+                reader = csv.DictReader(file)
 
-                symbol = row.get("Symbol")
+                for row in reader:
 
-                if symbol in self.indices:
+                    symbol = (row.get("Symbol") or "").strip()
+
+                    if symbol not in self.indices:
+                        continue
 
                     self.update_index(symbol, {
-                        "last_price": float(row.get("Last", 0)),
-                        "open_price": float(row.get("Open", 0)),
-                        "high_price": float(row.get("High", 0)),
-                        "low_price": float(row.get("Low", 0)),
-                        "previous_close": float(row.get("Prev Close", 0))
+                        "last_price": float(row.get("Last") or 0),
+                        "change": float(row.get("Change") or 0),
+                        "change_percent": float(row.get("%Change") or 0),
+                        "open_price": float(row.get("Open") or 0),
+                        "high_price": float(row.get("High") or 0),
+                        "low_price": float(row.get("Low") or 0),
+                        "previous_close": float(row.get("Prev Close") or 0),
+                        "volume": int(float(row.get("Volume") or 0))
                     })
 
+            print(f"Loaded Indices CSV: {self.indices_csv.name}")
+
+        except FileNotFoundError:
+            print("Indices CSV file not found.")
+
+        except PermissionError:
+            print("Permission denied while reading Indices CSV.")
+
+        except ValueError as error:
+            print(f"Invalid numeric value in Indices CSV: {error}")
+
+        except Exception as error:
+            print(f"Indices CSV Load Error: {error}")
 
     def load_fno_csv(self):
 
