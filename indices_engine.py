@@ -118,11 +118,10 @@ class IndicesEngine:
                     h.replace('"', '').replace("\ufeff", "").strip()
                     for h in reader.fieldnames
                 ]
-
+                
                 for row in reader:
                     print(reader.fieldnames)
                     print(row)
-                    break
 
                     index_name = (
                         row.get("INDEX")
@@ -131,6 +130,9 @@ class IndicesEngine:
                         or row.get("Index Name")
                         or ""
                     ).strip()
+
+                    print("INDEX NAME =", index_name)
+                    break
 
                     index_map = {
                         "NIFTY 50": "NIFTY",
