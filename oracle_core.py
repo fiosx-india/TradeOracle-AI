@@ -13,7 +13,6 @@ from signal_engine import SignalEngine
 
 
 class TradeOracle:
-
     def __init__(self):
 
         self.indices = IndicesEngine()
@@ -36,16 +35,13 @@ class TradeOracle:
 
         for symbol in market_data:
 
-            signal = self.signal.generate(
-                market_reports[symbol],
-                news_report
-            )
+            signal = self.signal.generate(market_reports[symbol], news_report)
 
             results[symbol] = {
                 "index": market_data[symbol],
                 "market": market_reports[symbol],
                 "news": news_report,
-                "signal": signal
+                "signal": signal,
             }
 
         return results
