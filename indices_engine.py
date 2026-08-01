@@ -39,7 +39,7 @@ class IndicesEngine:
             "INDIAVIX": IndexData("INDIAVIX", "INDIA VIX"),
         }
 
-        self.data_folder = Path("data")
+        self.data_folder = Path("/storage/emulated/0/Download")
 
         self.indices_csv = None
         self.fno_csv = None
