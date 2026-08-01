@@ -120,6 +120,9 @@ class IndicesEngine:
                 ]
 
                 for row in reader:
+                    print(reader.fieldnames)
+                    print(row)
+                    break
 
                     index_name = (
                         row.get("INDEX")
@@ -185,10 +188,6 @@ class IndicesEngine:
                 reader = csv.DictReader(file)
 
                 for row in reader:
-                    
-                    print(reader.fieldnames)
-                    print(row)
-                    break
                     
                     symbol = row.get("SYMBOL")
 
