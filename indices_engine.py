@@ -5,10 +5,12 @@ indices_engine.py
 Purpose:
 Fetch and manage live Indian indices data.
 """
-
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
+from pathlib import Path
+import csv
+import glob
 
 
 @dataclass
@@ -37,6 +39,10 @@ class IndicesEngine:
             "MIDCAP": IndexData("MIDCAP", "NIFTY MIDCAP SELECT"),
             "BANKEX": IndexData("BANKEX", "BANKEX"),
             "INDIAVIX": IndexData("INDIAVIX", "INDIA VIX"),
+            self.data_folder = Path("data")
+            self.indices_csv = None
+            self.fno_csv = None
+            self.load_latest_csv_files()
         }
 
     def get_all_indices(self) -> Dict[str, IndexData]:
@@ -63,3 +69,43 @@ class IndicesEngine:
 
     def get_symbols(self) -> List[str]:
         return list(self.indices.keys())
+
+    def load_latest_csv_files(self):
+
+        self.indices_csv = self.find_latest_file("MW-All-Indices*.csv")
+        self.fno_csv = self.find_latest_file("MW-SECURITIES*.csv")
+
+
+    def find_latest_file(self, pattern):
+
+        files = list(self.data_folder.glob(pattern))
+
+        if not files:
+            return None
+
+        return max(files, key=lambda f: f.stat().st_mtime)
+
+    def load_indices_csv(self):
+
+        if self.indices_csv is None:
+            return
+
+        with open(self.indices_csv,
+                  newline="",
+                  encoding="utf-8") as file:
+
+            reader = csv.DictReader(file)
+
+            for row in reader:
+
+                symbol = row.get("Symbol")
+
+                if symbol in self.indices:
+
+                    self.update_index(symbol, {
+                        "last_price": float(row.get("Last", 0)),
+                        "open_price": float(row.get("Open", 0)),
+                        "high_price": float(row.get("High", 0)),
+                        "low_price": float(row.get("Low", 0)),
+                        "previous_close": float(row.get("Prev Close", 0))
+                    })
