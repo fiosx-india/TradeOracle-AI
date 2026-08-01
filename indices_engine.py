@@ -28,7 +28,6 @@ class IndexData:
 
 
 class IndicesEngine:
-
     def __init__(self):
         self.indices = {
             "NIFTY": IndexData("NIFTY", "NIFTY 50"),
@@ -49,7 +48,7 @@ class IndicesEngine:
         self.load_latest_csv_files()
         self.load_indices_csv()
         self.load_fno_csv()
-        
+
     def get_all_indices(self) -> Dict[str, IndexData]:
         return self.indices
 
@@ -111,12 +110,7 @@ class IndicesEngine:
 
         try:
 
-            with open(
-                self.indices_csv,
-                mode="r",
-                newline="",
-                encoding="utf-8"
-            ) as file:
+            with open(self.indices_csv, mode="r", newline="", encoding="utf-8") as file:
 
                 reader = csv.DictReader(file)
 
@@ -127,16 +121,19 @@ class IndicesEngine:
                     if symbol not in self.indices:
                         continue
 
-                    self.update_index(symbol, {
-                        "last_price": float(row.get("Last") or 0),
-                        "change": float(row.get("Change") or 0),
-                        "change_percent": float(row.get("%Change") or 0),
-                        "open_price": float(row.get("Open") or 0),
-                        "high_price": float(row.get("High") or 0),
-                        "low_price": float(row.get("Low") or 0),
-                        "previous_close": float(row.get("Prev Close") or 0),
-                        "volume": int(float(row.get("Volume") or 0))
-                    })
+                    self.update_index(
+                        symbol,
+                        {
+                            "last_price": float(row.get("Last") or 0),
+                            "change": float(row.get("Change") or 0),
+                            "change_percent": float(row.get("%Change") or 0),
+                            "open_price": float(row.get("Open") or 0),
+                            "high_price": float(row.get("High") or 0),
+                            "low_price": float(row.get("Low") or 0),
+                            "previous_close": float(row.get("Prev Close") or 0),
+                            "volume": int(float(row.get("Volume") or 0)),
+                        },
+                    )
 
             print(f"Loaded Indices CSV: {self.indices_csv.name}")
 
@@ -160,11 +157,7 @@ class IndicesEngine:
             return
 
         try:
-            with open(
-                self.fno_csv,
-                newline="",
-                encoding="utf-8"
-            ) as file:
+            with open(self.fno_csv, newline="", encoding="utf-8") as file:
 
                 reader = csv.DictReader(file)
 
