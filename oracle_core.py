@@ -6,10 +6,10 @@ Purpose:
 Connect all TradeOracle AI modules.
 """
 
-from indices_engine import IndicesEngine
-from market_analyzer import MarketAnalyzer
-from news_analyzer import NewsAnalyzer
-from signal_engine import SignalEngine
+from .indices_engine import IndicesEngine
+from .market_analyzer import MarketAnalyzer
+from .news_analyzer import NewsAnalyzer
+from .signal_engine import SignalEngine
 
 
 class TradeOracle:
@@ -26,6 +26,9 @@ class TradeOracle:
         results = {}
 
         market_data = self.indices.get_all_indices()
+
+        if not market_data:
+            return {}
 
         market_reports = self.market.analyze_all(market_data)
 
