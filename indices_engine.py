@@ -40,10 +40,10 @@ class IndicesEngine:
             "INDIAVIX": IndexData("INDIAVIX", "INDIA VIX"),
         }
 
-            self.data_folder = Path("data")
-            self.indices_csv = None
-            self.fno_csv = None
-            self.load_latest_csv_files()
+        self.data_folder = Path("data")
+        self.indices_csv = None
+        self.fno_csv = None
+        self.load_latest_csv_files()
 
     def get_all_indices(self) -> Dict[str, IndexData]:
         return self.indices
