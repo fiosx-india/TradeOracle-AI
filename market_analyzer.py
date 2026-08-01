@@ -70,17 +70,37 @@ class MarketAnalyzer:
             result.bearish_score += 20
         else:
             result.trend = "SIDEWAYS"
-
+            
         # ---------- Momentum ----------
-        if abs(index_data.change_percent) >= 1.50:
+        cp = index_data.change_percent
+
+        if abs(cp) >= 1.50:
             result.momentum = "VERY_STRONG"
             result.strength += 30
-        elif abs(index_data.change_percent) >= 1.00:
+
+            if cp > 0:
+                result.bullish_score += 30
+            else:
+                result.bearish_score += 30
+
+        elif abs(cp) >= 1.00:
             result.momentum = "STRONG"
             result.strength += 20
-        elif abs(index_data.change_percent) >= 0.50:
+
+            if cp > 0:
+                result.bullish_score += 20
+            else:
+                result.bearish_score += 20
+
+        elif abs(cp) >= 0.50:
             result.momentum = "MODERATE"
             result.strength += 10
+
+            if cp > 0:
+                result.bullish_score += 10
+            else:
+                result.bearish_score += 10
+
         else:
             result.momentum = "WEAK"
 
