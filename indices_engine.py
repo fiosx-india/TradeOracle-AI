@@ -173,15 +173,6 @@ class IndicesEngine:
                     if symbol:
                         self.fno_symbols.append(symbol.strip())
 
-                reader = csv.DictReader(file)
-
-                for row in reader:
-
-                    symbol = row.get("SYMBOL")
-
-                    if symbol:
-                        self.fno_symbols.append(symbol.strip())
-
         except Exception as error:
             print(f"F&O CSV Load Error: {error}")
             
