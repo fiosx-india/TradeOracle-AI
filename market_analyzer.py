@@ -58,81 +58,81 @@ class MarketAnalyzer:
     def __init__(self):
         pass
 
-def analyze(self, index_data) -> MarketAnalysis:
+    def analyze(self, index_data) -> MarketAnalysis:
 
-    result = MarketAnalysis()
+        result = MarketAnalysis()
 
-    # ---------- Trend ----------
-    if index_data.last_price > index_data.open_price:
-        result.trend = "BULLISH"
-        result.bullish_score += 20
-    elif index_data.last_price < index_data.open_price:
-        result.trend = "BEARISH"
-        result.bearish_score += 20
-    else:
-        result.trend = "SIDEWAYS"
+        # ---------- Trend ----------
+        if index_data.last_price > index_data.open_price:
+            result.trend = "BULLISH"
+            result.bullish_score += 20
+        elif index_data.last_price < index_data.open_price:
+            result.trend = "BEARISH"
+            result.bearish_score += 20
+        else:
+            result.trend = "SIDEWAYS"
 
-    # ---------- Momentum ----------
-    if abs(index_data.change_percent) >= 1.50:
-        result.momentum = "VERY_STRONG"
-        result.strength += 30
-    elif abs(index_data.change_percent) >= 1.00:
-        result.momentum = "STRONG"
-        result.strength += 20
-    elif abs(index_data.change_percent) >= 0.50:
-        result.momentum = "MODERATE"
-        result.strength += 10
-    else:
-        result.momentum = "WEAK"
+        # ---------- Momentum ----------
+        if abs(index_data.change_percent) >= 1.50:
+            result.momentum = "VERY_STRONG"
+            result.strength += 30
+        elif abs(index_data.change_percent) >= 1.00:
+            result.momentum = "STRONG"
+            result.strength += 20
+        elif abs(index_data.change_percent) >= 0.50:
+            result.momentum = "MODERATE"
+            result.strength += 10
+        else:
+            result.momentum = "WEAK"
 
-    # ---------- Support / Resistance ----------
-    result.support = index_data.low_price
-    result.resistance = index_data.high_price
+        # ---------- Support / Resistance ----------
+        result.support = index_data.low_price
+        result.resistance = index_data.high_price
 
-    # ---------- Breakout ----------
-    if index_data.last_price >= index_data.high_price:
-        result.breakout = True
-        result.bullish_score += 20
+        # ---------- Breakout ----------
+        if index_data.last_price >= index_data.high_price:
+            result.breakout = True
+            result.bullish_score += 20
 
-    # ---------- Breakdown ----------
-    if index_data.last_price <= index_data.low_price:
-        result.breakdown = True
-        result.bearish_score += 20
+        # ---------- Breakdown ----------
+        if index_data.last_price <= index_data.low_price:
+            result.breakdown = True
+            result.bearish_score += 20
 
-    # ---------- Volume ----------
-    if index_data.volume > 0:
-        result.volume_status = "AVAILABLE"
-    else:
-        result.volume_status = "UNAVAILABLE"
+        # ---------- Volume ----------
+        if index_data.volume > 0:
+            result.volume_status = "AVAILABLE"
+        else:
+            result.volume_status = "UNAVAILABLE"
 
-    # ---------- Confidence ----------
-    result.confidence = min(
-        max(result.bullish_score, result.bearish_score),
-        100
-    )
+        # ---------- Confidence ----------
+        result.confidence = min(
+            max(result.bullish_score, result.bearish_score),
+            100
+        )
 
-    # ---------- Market Score ----------
-    result.market_score = (
-        result.bullish_score - result.bearish_score
-    )
+        # ---------- Market Score ----------
+        result.market_score = (
+            result.bullish_score - result.bearish_score
+        )
 
-    # ---------- Forecast ----------
-    if result.market_score >= 20:
-        result.prediction_5m = "UP"
-        result.prediction_15m = "UP"
-        result.prediction_30m = "UP"
-        result.prediction_1h = "UP"
+        # ---------- Forecast ----------
+        if result.market_score >= 20:
+            result.prediction_5m = "UP"
+            result.prediction_15m = "UP"
+            result.prediction_30m = "UP"
+            result.prediction_1h = "UP"
 
-    elif result.market_score <= -20:
-        result.prediction_5m = "DOWN"
-        result.prediction_15m = "DOWN"
-        result.prediction_30m = "DOWN"
-        result.prediction_1h = "DOWN"
+        elif result.market_score <= -20:
+            result.prediction_5m = "DOWN"
+            result.prediction_15m = "DOWN"
+            result.prediction_30m = "DOWN"
+            result.prediction_1h = "DOWN"
 
-    else:
-        result.prediction_5m = "SIDEWAYS"
-        result.prediction_15m = "SIDEWAYS"
-        result.prediction_30m = "SIDEWAYS"
-        result.prediction_1h = "SIDEWAYS"
+        else:
+            result.prediction_5m = "SIDEWAYS"
+            result.prediction_15m = "SIDEWAYS"
+            result.prediction_30m = "SIDEWAYS"
+            result.prediction_1h = "SIDEWAYS"
 
-    return result
+        return result
