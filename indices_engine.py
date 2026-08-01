@@ -113,6 +113,12 @@ class IndicesEngine:
             with open(self.indices_csv, mode="r", newline="", encoding="utf-8") as file:
 
                 reader = csv.DictReader(file)
+
+                reader.fieldnames = [
+                    h.replace('"', '').replace("\ufeff", "").strip()
+                    for h in reader.fieldnames
+                ]
+
                 for row in reader:
 
                     symbol = (row.get("Symbol") or "").strip()
@@ -167,10 +173,14 @@ class IndicesEngine:
                     if symbol:
                         self.fno_symbols.append(symbol.strip())
 
-                symbol = row.get("SYMBOL")
+                reader = csv.DictReader(file)
 
-                if symbol:
-                    self.fno_symbols.append(symbol.strip())
+                for row in reader:
+
+                    symbol = row.get("SYMBOL")
+
+                    if symbol:
+                        self.fno_symbols.append(symbol.strip())
 
         except Exception as error:
             print(f"F&O CSV Load Error: {error}")
