@@ -113,8 +113,6 @@ class IndicesEngine:
             with open(self.indices_csv, mode="r", newline="", encoding="utf-8") as file:
 
                 reader = csv.DictReader(file)
-                print(reader.fieldnames)
-                print(next(reader))
                 for row in reader:
 
                     symbol = (row.get("Symbol") or "").strip()
@@ -125,14 +123,14 @@ class IndicesEngine:
                     self.update_index(
                         symbol,
                         {
-                            "last_price": float(row.get("Last") or 0),
-                            "change": float(row.get("Change") or 0),
-                            "change_percent": float(row.get("%Change") or 0),
-                            "open_price": float(row.get("Open") or 0),
-                            "high_price": float(row.get("High") or 0),
-                            "low_price": float(row.get("Low") or 0),
-                            "previous_close": float(row.get("Prev Close") or 0),
-                            "volume": int(float(row.get("Volume") or 0)),
+                            "last_price": float((row.get("CURRENT") or "0").replace(",", "")),
+                            "change": 0.0,
+                            "change_percent": float((row.get("%CHNG") or "0").replace(",", "")),
+                            "open_price": float((row.get("OPEN") or "0").replace(",", "")),
+                            "high_price": float((row.get("HIGH") or "0").replace(",", "")),
+                            "low_price": float((row.get("LOW") or "0").replace(",", "")),
+                            "previous_close": float((row.get("PREV. CLOSE") or "0").replace(",", "")),
+                            "volume": 0,
                         },
                     )
 
@@ -163,8 +161,11 @@ class IndicesEngine:
                 reader = csv.DictReader(file)
 
                 for row in reader:
-                    print(row)
-                    break
+
+                    symbol = row.get("SYMBOL")
+
+                    if symbol:
+                        self.fno_symbols.append(symbol.strip())
 
                 symbol = row.get("SYMBOL")
 
