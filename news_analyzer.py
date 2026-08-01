@@ -25,6 +25,13 @@ class NewsAnalysis:
     total_score: float = 0.0
     news_count: int = 0
     high_impact: bool = False
+    positive_count: int = 0
+        negative_count: int = 0
+
+        bullish_score: float = 0.0
+        bearish_score: float = 0.0
+
+        recommendation: str = "HOLD"
 
 
 class NewsAnalyzer:
@@ -58,13 +65,25 @@ class NewsAnalyzer:
             return result
 
         score = 0
+        positive = 0
+        negative = 0
 
         for item in self.news:
 
             score += item.impact_score
+            
+            if item.sentiment.upper() == "POSITIVE":
+                positive += 1
+                result.bullish_score += item.impact_score
+
+            elif item.sentiment.upper() == "NEGATIVE":
+                negative += 1
+                result.bearish_score += item.impact_score
 
         result.news_count = len(self.news)
         result.total_score = score
+        result.positive_count = positive
+        result.negative_count = negative
 
         average = score / len(self.news)
 
@@ -79,7 +98,14 @@ class NewsAnalyzer:
 
         if average >= 80:
             result.high_impact = True
+        if result.bullish_score > result.bearish_score:
+            result.recommendation = "BUY"
 
+        elif result.bearish_score > result.bullish_score:
+            result.recommendation = "SELL"
+
+        else:
+            result.recommendation = "HOLD"
         return result
 
     def clear(self):
