@@ -44,7 +44,6 @@ class IndicesEngine:
 
         self.indices_csv = None
         self.fno_csv = None
-        self.fno_symbols = []
 
         self.load_latest_csv_files()
 
