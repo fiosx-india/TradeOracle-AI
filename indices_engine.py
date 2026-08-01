@@ -110,7 +110,7 @@ class IndicesEngine:
 
         try:
 
-            with open(self.indices_csv, mode="r", newline="", encoding="utf-8") as file:
+            with open(self.indices_csv, mode="r", newline="", encoding="utf-8-sig") as file:
 
                 reader = csv.DictReader(file)
 
@@ -121,7 +121,13 @@ class IndicesEngine:
 
                 for row in reader:
 
-                    index_name = (row.get("INDEX") or "").strip()
+                    index_name = (
+                        row.get("INDEX")
+                        or row.get("Index")
+                        or row.get("INDEX NAME")
+                        or row.get("Index Name")
+                        or ""
+                    ).strip()
 
                     index_map = {
                         "NIFTY 50": "NIFTY",
@@ -179,7 +185,11 @@ class IndicesEngine:
                 reader = csv.DictReader(file)
 
                 for row in reader:
-
+                    
+                    print(reader.fieldnames)
+                    print(row)
+                    break
+                    
                     symbol = row.get("SYMBOL")
 
                     if symbol:
