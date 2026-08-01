@@ -10,7 +10,6 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from pathlib import Path
 import csv
-import glob
 
 
 @dataclass
@@ -39,11 +38,12 @@ class IndicesEngine:
             "MIDCAP": IndexData("MIDCAP", "NIFTY MIDCAP SELECT"),
             "BANKEX": IndexData("BANKEX", "BANKEX"),
             "INDIAVIX": IndexData("INDIAVIX", "INDIA VIX"),
+        }
+
             self.data_folder = Path("data")
             self.indices_csv = None
             self.fno_csv = None
             self.load_latest_csv_files()
-        }
 
     def get_all_indices(self) -> Dict[str, IndexData]:
         return self.indices
