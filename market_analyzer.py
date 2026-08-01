@@ -136,3 +136,12 @@ class MarketAnalyzer:
             result.prediction_1h = "SIDEWAYS"
 
         return result
+
+    def analyze_all(self, indices: Dict) -> Dict[str, MarketAnalysis]:
+
+            reports = {}
+
+            for symbol, data in indices.items():
+                reports[symbol] = self.analyze(data)
+
+            return reports
