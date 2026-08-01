@@ -34,17 +34,16 @@ class TradeOracle:
         news_report = self.news.analyze()
 
         for symbol in market_data:
+            
+            report = market_reports[symbol]
 
+            print(f"\n{symbol}")
+            print("Bullish :", report.bullish_score)
+            print("Bearish :", report.bearish_score)
+            print("Market Score :", report.market_score)
+            print("News :", news_report.overall_sentiment)
 
-        report = market_reports[symbol]
-
-        print(f"\n{symbol}")
-        print("Bullish :", report.bullish_score)
-        print("Bearish :", report.bearish_score)
-        print("Market Score :", report.market_score)
-        print("News :", news_report.overall_sentiment)
-
-        signal = self.signal.generate(report, news_report)
+            signal = self.signal.generate(report, news_report)
 
             results[symbol] = {
                 "index": market_data[symbol],
