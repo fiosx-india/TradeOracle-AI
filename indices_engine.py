@@ -47,13 +47,6 @@ class IndicesEngine:
         self.load_indices_csv()
         self.load_fno_csv()
         self.fno_symbols = []
-
-    
-    if self.indices_csv is None:
-        print("MW-All-Indices CSV not found")
-
-    if self.fno_csv is None:
-        print("MW-SECURITIES CSV not found")
         
     def get_all_indices(self) -> Dict[str, IndexData]:
         return self.indices
@@ -84,7 +77,12 @@ class IndicesEngine:
 
         self.indices_csv = self.find_latest_file("MW-All-Indices*.csv")
         self.fno_csv = self.find_latest_file("MW-SECURITIES*.csv")
+        
+        if self.indices_csv is None:
+            print("MW-All-Indices CSV not found")
 
+        if self.fno_csv is None:
+            print("MW-SECURITIES CSV not found")
 
     def find_latest_file(self, pattern):
 
