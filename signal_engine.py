@@ -24,8 +24,8 @@ class SignalResult:
     target: float = 0.0
     stoploss: float = 0.0
 
-class SignalEngine:
 
+class SignalEngine:
     def __init__(self):
         pass
 
@@ -53,7 +53,7 @@ class SignalEngine:
             result.expected_time = "30m"
             result.reason = "Bullish market with positive news"
             result.risk_level = "LOW"
-            
+
         elif bearish >= bullish + 15:
 
             result.signal = "SELL"
@@ -71,5 +71,5 @@ class SignalEngine:
             result.expected_time = "15m"
             result.reason = "No clear market direction"
             result.risk_level = "HIGH"
-            
+
         return result
