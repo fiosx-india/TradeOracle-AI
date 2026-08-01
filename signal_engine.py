@@ -16,7 +16,13 @@ class SignalResult:
     probability: float = 0.0
     expected_time: str = "15m"
     reason: str = ""
+    market_score: float = 0.0
+    news_score: float = 0.0
 
+    risk_level: str = "MEDIUM"
+
+    target: float = 0.0
+    stoploss: float = 0.0
 
 class SignalEngine:
 
@@ -29,6 +35,9 @@ class SignalEngine:
 
         bullish = market.bullish_score
         bearish = market.bearish_score
+
+        result.market_score = market.market_score
+        result.news_score = news.total_score
 
         if news.overall_sentiment == "POSITIVE":
             bullish += 20
@@ -43,7 +52,8 @@ class SignalEngine:
             result.probability = min(95, bullish)
             result.expected_time = "30m"
             result.reason = "Bullish market with positive news"
-
+            result.risk_level = "LOW"
+            
         elif bearish >= bullish + 15:
 
             result.signal = "SELL"
@@ -51,6 +61,7 @@ class SignalEngine:
             result.probability = min(95, bearish)
             result.expected_time = "30m"
             result.reason = "Bearish market with negative news"
+            result.risk_level = "LOW"
 
         else:
 
@@ -59,5 +70,6 @@ class SignalEngine:
             result.probability = 50
             result.expected_time = "15m"
             result.reason = "No clear market direction"
-
+            result.risk_level = "HIGH"
+            
         return result
