@@ -26,14 +26,13 @@ class NewsAnalysis:
     news_count: int = 0
     high_impact: bool = False
     positive_count: int = 0
-        negative_count: int = 0
+    negative_count: int = 0
 
-        bullish_score: float = 0.0
-        bearish_score: float = 0.0
+    bullish_score: float = 0.0
+    bearish_score: float = 0.0
 
-        recommendation: str = "HOLD"
-
-
+    recommendation: str = "HOLD"
+    
 class NewsAnalyzer:
 
     def __init__(self):
