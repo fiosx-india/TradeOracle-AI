@@ -54,7 +54,6 @@ class MarketAnalysis:
 
 
 class MarketAnalyzer:
-
     def __init__(self):
         pass
 
@@ -106,15 +105,10 @@ class MarketAnalyzer:
             result.volume_status = "UNAVAILABLE"
 
         # ---------- Confidence ----------
-        result.confidence = min(
-            max(result.bullish_score, result.bearish_score),
-            100
-        )
+        result.confidence = min(max(result.bullish_score, result.bearish_score), 100)
 
         # ---------- Market Score ----------
-        result.market_score = (
-            result.bullish_score - result.bearish_score
-        )
+        result.market_score = result.bullish_score - result.bearish_score
 
         # ---------- Forecast ----------
         if result.market_score >= 20:
@@ -139,9 +133,9 @@ class MarketAnalyzer:
 
     def analyze_all(self, indices: Dict) -> Dict[str, MarketAnalysis]:
 
-            reports = {}
+        reports = {}
 
-            for symbol, data in indices.items():
-                reports[symbol] = self.analyze(data)
+        for symbol, data in indices.items():
+            reports[symbol] = self.analyze(data)
 
-            return reports
+        return reports
