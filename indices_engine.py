@@ -44,6 +44,7 @@ class IndicesEngine:
         self.indices_csv = None
         self.fno_csv = None
         self.load_latest_csv_files()
+        self.load_indices_csv()
 
     def get_all_indices(self) -> Dict[str, IndexData]:
         return self.indices
