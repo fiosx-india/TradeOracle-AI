@@ -113,8 +113,8 @@ class IndicesEngine:
             with open(self.indices_csv, mode="r", newline="", encoding="utf-8") as file:
 
                 reader = csv.DictReader(file)
-                 print(reader.fieldnames)
-                 print(next(reader))
+                print(reader.fieldnames)
+                print(next(reader))
                 for row in reader:
 
                     symbol = (row.get("Symbol") or "").strip()
