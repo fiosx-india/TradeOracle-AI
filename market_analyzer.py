@@ -12,19 +12,45 @@ from typing import Dict
 
 @dataclass
 class MarketAnalysis:
+
+    # Market Direction
     trend: str = "NEUTRAL"
     momentum: str = "NORMAL"
     strength: float = 0.0
+    confidence: float = 0.0
+
+    # Price Action
     breakout: bool = False
+    breakdown: bool = False
 
     support: float = 0.0
     resistance: float = 0.0
 
+    # Technical Analysis
+    ema20: float = 0.0
+    ema50: float = 0.0
+    rsi: float = 0.0
+    macd: float = 0.0
+    signal_line: float = 0.0
+    vwap: float = 0.0
+    atr: float = 0.0
+    adx: float = 0.0
+
+    # Market Behaviour
     volume_status: str = "NORMAL"
     oi_status: str = "UNKNOWN"
+    vix_status: str = "NORMAL"
 
+    # Score
     bullish_score: float = 0.0
     bearish_score: float = 0.0
+    market_score: float = 0.0
+
+    # Forecast
+    prediction_5m: str = "NEUTRAL"
+    prediction_15m: str = "NEUTRAL"
+    prediction_30m: str = "NEUTRAL"
+    prediction_1h: str = "NEUTRAL"
 
 
 class MarketAnalyzer:
