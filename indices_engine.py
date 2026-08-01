@@ -42,13 +42,13 @@ class IndicesEngine:
 
         self.data_folder = Path("data")
 
-                self.indices_csv = None
-                self.fno_csv = None
-                self.fno_symbols = []
+        self.indices_csv = None
+        self.fno_csv = None
+        self.fno_symbols = []
 
-                self.load_latest_csv_files()
-                self.load_indices_csv()
-                self.load_fno_csv()
+        self.load_latest_csv_files()
+        self.load_indices_csv()
+        self.load_fno_csv()
         
     def get_all_indices(self) -> Dict[str, IndexData]:
         return self.indices
