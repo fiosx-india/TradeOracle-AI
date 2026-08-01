@@ -161,7 +161,9 @@ class IndicesEngine:
 
                 reader = csv.DictReader(file)
 
-                for row in reader:
+                  for row in reader:
+                    print(row)
+                    break              
 
                     symbol = row.get("SYMBOL")
 
