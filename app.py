@@ -133,12 +133,28 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
-    st.subheader("Market Summary")
+    st.subheader("📊 Market Summary")
 
     for symbol, result in results.items():
+
+        market = result["market"]
+        signal = result["signal"]
+
         with st.expander(symbol):
-            st.write(result["market"])
-            st.write(result["signal"])
+
+            st.write(f"**Trend :** {market.trend}")
+            st.write(f"**Momentum :** {market.momentum}")
+
+            st.write(f"**Signal :** {signal.signal}")
+            st.write(f"**Confidence :** {signal.confidence}%")
+            st.write(f"**Probability :** {signal.probability}%")
+
+            st.write(f"**Target :** {signal.target}")
+            st.write(f"**Stop Loss :** {signal.stoploss}")
+
+            st.write(f"**Reason :** {signal.reason}")
+
+            st.write(f"**Risk Level :** {signal.risk_level}")
 
 elif page == "🏢 F&O Companies":
 
