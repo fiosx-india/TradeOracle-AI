@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 
@@ -143,16 +144,20 @@ elif page == "🏢 F&O Companies":
 
     st.header("🏢 F&O Companies")
 
-    st.header(company)
+    st.header(selected_company)
 
-    st.success(f"Selected Company : {company}")
+    st.success(f"Selected Company : {selected_company}")
 
-    if oracle.indices.is_fno_symbol(company):
+    if oracle.indices.is_fno_symbol(selected_company):
+        
         st.success("✅ F&O Eligible Company")
     else:
         st.error("❌ Not an F&O Company")
 
-    st.info("Company AI Analysis coming soon.")
+    st.info(
+        "Technical analysis, market trend, AI prediction and trading signals "
+        "for this company will be available soon."
+    )
 
 elif page == "🟢 Buy Signals":
 
