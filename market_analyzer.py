@@ -61,15 +61,16 @@ class MarketAnalyzer:
     def analyze(self, index_data) -> MarketAnalysis:
 
         result = MarketAnalysis()
-        # Indicator values
-        result.ema20 = 0.0
-        result.ema50 = 0.0
-        result.rsi = 0.0
-        result.macd = 0.0
-        result.signal_line = 0.0
-        result.vwap = 0.0
-        result.atr = 0.0
-        result.adx = 0.0
+        indicator = self.indicators.analyze_indicators(index_data)
+
+        result.ema20 = indicator.ema20
+        result.ema50 = indicator.ema50
+        result.rsi = indicator.rsi
+        result.macd = indicator.macd
+        result.signal_line = indicator.signal_line
+        result.vwap = indicator.vwap
+        result.atr = indicator.atr
+        result.adx = indicator.adx
         
         # ---------- Trend ----------
         if index_data.last_price > index_data.open_price:
