@@ -181,7 +181,6 @@ class IndicesEngine:
         except Exception as error:
             print(f"Indices CSV Load Error: {error}")
 
-
     def load_summary_csv(self):
 
         if self.summary_csv is None:
@@ -199,26 +198,34 @@ class IndicesEngine:
                     if index_id not in ("SENSEX", "BANKEX"):
                         continue
 
+                    previous_close = float((row.get("PreviousClose") or "0").replace(",", ""))
+                    close_price = float((row.get("ClosePrice") or "0").replace(",", ""))
+
+                    change = close_price - previous_close
+
+                    if previous_close != 0:
+                        change_percent = (change / previous_close) * 100
+                    else:
+                        change_percent = 0.0
+
                     self.update_index(
                         index_id,
-                            {
-                                "last_price": close_price,
-                                "change": change,
-                                "change_percent": change_percent,
-                                "open_price": float((row.get("OpenPrice") or "0").replace(",", "")),
-                                "high_price": float((row.get("HighPrice") or "0").replace(",", "")),
-                                "low_price": float((row.get("LowPrice") or "0").replace(",", "")),
-                                "previous_close": previous_close,
-                                
-                            },
-                        )
+                        {
+                            "last_price": close_price,
+                            "change": change,
+                            "change_percent": change_percent,
+                            "open_price": float((row.get("OpenPrice") or "0").replace(",", "")),
+                            "high_price": float((row.get("HighPrice") or "0").replace(",", "")),
+                            "low_price": float((row.get("LowPrice") or "0").replace(",", "")),
+                            "previous_close": previous_close,
+                        },
+                    )
 
             print(f"Loaded Summary CSV: {self.summary_csv.name}")
 
         except Exception as error:
             print(f"Summary CSV Load Error: {error}")
             
-
     def load_fno_csv(self):
 
         self.fno_symbols = []
