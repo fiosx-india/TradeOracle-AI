@@ -7,7 +7,6 @@ Calculate technical indicators for TradeOracle AI.
 """
 
 from dataclasses import dataclass
-from typing import List
 
 @dataclass
 class IndicatorResult:
