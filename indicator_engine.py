@@ -11,7 +11,9 @@ from typing import List
 
 @dataclass
 class IndicatorResult:
-
+    
+    def __init__(self):
+        pass
     ema20: float = 0.0
     ema50: float = 0.0
 
