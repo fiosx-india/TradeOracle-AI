@@ -12,6 +12,20 @@ st.set_page_config(
 st.title("📈 TradeOracle AI Dashboard")
 st.caption("Indian Market Intelligence")
 
+# ---------------- Sidebar ----------------
+
+st.sidebar.title("📊 TradeOracle AI")
+
+page = st.sidebar.radio(
+    "Navigation",
+    [
+        "📈 Market Overview",
+        "🏢 F&O Companies",
+        "🟢 Buy Signals",
+        "🔴 Sell Signals",
+    ]
+)
+
 oracle = TradeOracle()
 results = oracle.analyze()
 
@@ -39,12 +53,45 @@ for symbol, result in results.items():
     })
 
 df = pd.DataFrame(rows)
+# ---------------- Pages ----------------
 
-st.dataframe(df, use_container_width=True)
+if page == "📈 Market Overview":
 
-st.subheader("Market Summary")
+    st.dataframe(df, use_container_width=True)
 
-for symbol, result in results.items():
-    with st.expander(symbol):
-        st.write(result["market"])
-        st.write(result["signal"])
+elif page == "🏢 F&O Companies":
+
+    st.header("🏢 F&O Companies")
+
+    company = st.sidebar.selectbox(
+        "Select Company",
+        sorted(oracle.indices.fno_symbols)
+    )
+
+    st.success(company)
+    st.info("Company Analysis coming next.")
+
+elif page == "🟢 Buy Signals":
+
+    st.header("🟢 Buy Signals")
+
+    buy_df = df[df["Signal"] == "BUY"]
+
+    st.dataframe(buy_df, use_container_width=True)
+
+elif page == "🔴 Sell Signals":
+
+    st.header("🔴 Sell Signals")
+
+    sell_df = df[df["Signal"] == "SELL"]
+
+    st.dataframe(sell_df, use_container_width=True)
+
+if page == "📈 Market Overview":
+
+    st.subheader("Market Summary")
+
+    for symbol, result in results.items():
+        with st.expander(symbol):
+            st.write(result["market"])
+            st.write(result["signal"])
