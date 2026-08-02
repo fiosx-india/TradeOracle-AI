@@ -42,12 +42,15 @@ class IndicesEngine:
         self.data_folder = Path("/storage/emulated/0/Download")
 
         self.indices_csv = None
+        self.summary_csv = None
         self.fno_csv = None
         self.fno_symbols = []
 
         self.load_latest_csv_files()
         self.load_indices_csv()
+        self.load_summary_csv()
         self.load_fno_csv()
+        
 
     def get_all_indices(self) -> Dict[str, IndexData]:
         return self.indices
@@ -82,6 +85,7 @@ class IndicesEngine:
 
         self.indices_csv = self.find_latest_file("MW-All-Indices*.csv")
         self.fno_csv = self.find_latest_file("MW-SECURITIES*.csv")
+        self.summary_csv = self.find_latest_file("INDEXSummary*.csv")
 
         if self.indices_csv:
             print(f"Loaded Indices CSV : {self.indices_csv.name}")
@@ -92,6 +96,11 @@ class IndicesEngine:
             print(f"Loaded F&O CSV : {self.fno_csv.name}")
         else:
             print("Warning: MW-SECURITIES CSV not found.")
+            
+        if self.summary_csv:
+            print(f"Loaded Summary CSV : {self.summary_csv.name}")
+        else:
+            print("Warning: INDEXSummary CSV not found.")
 
     def find_latest_file(self, pattern):
 
