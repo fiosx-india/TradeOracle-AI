@@ -239,11 +239,19 @@ class IndicesEngine:
                 reader = csv.DictReader(file)
 
                 for row in reader:
-                    
+
                     symbol = row.get("SYMBOL")
 
                     if symbol:
-                        self.fno_symbols.append(symbol.strip())
+                        symbol = symbol.strip()
+
+                        self.fno_symbols.append(symbol)
+
+                        if symbol not in self.indices:
+                            self.indices[symbol] = IndexData(
+                                symbol=symbol,
+                                name=symbol
+                            )              
 
         except Exception as error:
             print(f"F&O CSV Load Error: {error}")
