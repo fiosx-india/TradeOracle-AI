@@ -55,12 +55,21 @@ class MarketAnalysis:
 
 class MarketAnalyzer:
     def __init__(self):
-        pass
+        self.indicators = IndicatorEngine()
 
     def analyze(self, index_data) -> MarketAnalysis:
 
         result = MarketAnalysis()
-
+        # Indicator values
+        result.ema20 = 0.0
+        result.ema50 = 0.0
+        result.rsi = 0.0
+        result.macd = 0.0
+        result.signal_line = 0.0
+        result.vwap = 0.0
+        result.atr = 0.0
+        result.adx = 0.0
+        
         # ---------- Trend ----------
         if index_data.last_price > index_data.open_price:
             result.trend = "BULLISH"
