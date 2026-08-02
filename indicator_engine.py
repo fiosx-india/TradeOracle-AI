@@ -12,8 +12,6 @@ from typing import List
 @dataclass
 class IndicatorResult:
     
-    def __init__(self):
-        pass
     ema20: float = 0.0
     ema50: float = 0.0
 
@@ -32,6 +30,11 @@ class IndicatorResult:
     adx: float = 0.0
 
     obv: float = 0.0
+
+class IndicatorEngine:
+
+    def __init__(self):
+        pass
 
 def calculate_ema(self, prices, period=20):
     """
