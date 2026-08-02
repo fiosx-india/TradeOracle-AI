@@ -214,17 +214,29 @@ class IndicatorEngine:
 
         result = IndicatorResult()
 
-        # Default values until historical market data is available
-        result.ema20 = 0.0
-        result.ema50 = 0.0
-        result.sma20 = 0.0
-        result.sma50 = 0.0
-        result.rsi = 0.0
+        # Historical data not available yet.
+        # Use current market snapshot as placeholder values.
+
+        result.ema20 = market_data.last_price
+        result.ema50 = market_data.last_price
+
+        result.sma20 = market_data.last_price
+        result.sma50 = market_data.last_price
+
+        result.rsi = 50.0
+
         result.macd = 0.0
         result.signal_line = 0.0
-        result.vwap = 0.0
-        result.atr = 0.0
+
+        result.vwap = market_data.last_price
+
+        result.atr = max(
+            0.0,
+            market_data.high_price - market_data.low_price
+        )
+
         result.adx = 0.0
-        result.obv = 0.0
+
+        result.obv = market_data.volume
 
         return result
