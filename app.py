@@ -33,9 +33,22 @@ st.sidebar.divider()
 
 st.sidebar.subheader("🏢 F&O Companies")
 
-company = st.sidebar.selectbox(
-    "Select Company",
-    sorted(oracle.indices.fno_symbols)
+companies = sorted(oracle.indices.fno_symbols)
+
+st.sidebar.caption(f"Total Companies : {len(companies)}")
+
+search = st.sidebar.text_input(
+    "🔍 Search Company"
+)
+
+filtered_companies = [
+    c for c in companies
+    if search.upper() in c.upper()
+]
+
+selected_company = st.sidebar.selectbox(
+    "Company",
+    filtered_companies
 )
 
 if not results:
