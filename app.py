@@ -9,22 +9,6 @@ st.set_page_config(
     layout="wide"
 )
 
-st.markdown("""
-<style>
-[data-testid="stSidebar"]{
-    min-width:220px;
-    max-width:220px;
-}
-
-.block-container{
-    max-width:95%;
-    padding-top:1rem;
-    padding-left:2rem;
-    padding-right:2rem;
-}
-</style>
-""", unsafe_allow_html=True)
-
 st.title("📈 TradeOracle AI Dashboard")
 st.caption("Indian Market Intelligence")
 
