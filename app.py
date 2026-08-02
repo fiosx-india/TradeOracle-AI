@@ -76,78 +76,81 @@ company = st.sidebar.selectbox(
 
 if page == "📈 Market Overview":
 
-    st.header("📈 Market Overview")
-    st.dataframe(df, use_container_width=True, hide_index=True)
-
-    st.markdown("---")
+    st.dataframe(df, use_container_width=True)
 
     col1, col2 = st.columns(2)
 
     with col1:
         st.subheader("🟢 Top BUY")
+
         buy_df = (
             df[df["Signal"] == "BUY"]
             .sort_values("Confidence", ascending=False)
             .head(10)
         )
+
         st.dataframe(
-            buy_df[["Index", "Last Price", "Confidence", "Probability", "Reason"]],
+            buy_df[
+                [
+                    "Index",
+                    "Last Price",
+                    "Confidence",
+                    "Probability",
+                    "Reason"
+                ]
+            ],
             use_container_width=True,
             hide_index=True
         )
 
     with col2:
         st.subheader("🔴 Top SELL")
+
         sell_df = (
             df[df["Signal"] == "SELL"]
             .sort_values("Confidence", ascending=False)
             .head(10)
         )
+
         st.dataframe(
-            sell_df[["Index", "Last Price", "Confidence", "Probability", "Reason"]],
+            sell_df[
+                [
+                    "Index",
+                    "Last Price",
+                    "Confidence",
+                    "Probability",
+                    "Reason"
+                ]
+            ],
             use_container_width=True,
             hide_index=True
         )
 
-    st.markdown("---")
-    st.subheader("📊 Market Summary")
+    st.subheader("Market Summary")
 
     for symbol, result in results.items():
-        with st.expander(f"🔹 {symbol}", expanded=False):
-            st.write(result.get("market", "No market data"))
-            st.write(result.get("signal", "No signal data"))
+        with st.expander(symbol):
+            st.write(result["market"])
+            st.write(result["signal"])
 
 elif page == "🏢 F&O Companies":
 
     st.header("🏢 F&O Companies")
 
-    # Company Selection
-    company_list = sorted(df["Index"].unique().tolist()) if "Index" in df.columns else []
-    company = st.selectbox(
-        "Select Company",
-        options=company_list,
-        key="fno_company_select"
-    )
+    st.header(company)
 
-    if company:
-        st.markdown("---")
-        st.subheader(f"📌 {company}")
-        st.success(f"**Selected Company :** {company}")
+    st.success(f"Selected Company : {company}")
 
-        # F&O Status
-        if oracle.indices.is_fno_symbol(company):
-            st.success("✅ F&O Eligible Company")
-        else:
-            st.error("❌ Not an F&O Company")
-
-        st.info("🤖 Company AI Analysis coming soon.")
+    if oracle.indices.is_fno_symbol(company):
+        st.success("✅ F&O Eligible Company")
     else:
-        st.warning("Please select a company to view details.")
+        st.error("❌ Not an F&O Company")
+
+    st.info("Company AI Analysis coming soon.")
 
 elif page == "🟢 Buy Signals":
 
     st.header("🟢 Buy Signals")
-    st.markdown("High confidence BUY opportunities sorted by confidence score.")
 
     buy_df = (
         df[df["Signal"] == "BUY"]
@@ -160,12 +163,9 @@ elif page == "🟢 Buy Signals":
         hide_index=True
     )
 
-    st.caption(f"Total Buy Signals: **{len(buy_df)}**")
-
 elif page == "🔴 Sell Signals":
 
     st.header("🔴 Sell Signals")
-    st.markdown("High confidence SELL opportunities sorted by confidence score.")
 
     sell_df = (
         df[df["Signal"] == "SELL"]
@@ -176,6 +176,4 @@ elif page == "🔴 Sell Signals":
         sell_df,
         use_container_width=True,
         hide_index=True
-    )
-
-    st.caption(f"Total Sell Signals: **{len(sell_df)}**")
+        )
