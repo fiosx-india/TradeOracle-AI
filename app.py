@@ -59,6 +59,41 @@ if page == "📈 Market Overview":
 
     st.dataframe(df, use_container_width=True)
 
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("🟢 Top BUY")
+        buy_df = (
+            df[df["Signal"] == "BUY"]
+            .sort_values("Confidence", ascending=False)
+            .head(10)
+        )
+        st.dataframe(
+            buy_df,
+            use_container_width=True,
+            hide_index=True
+        )
+
+    with col2:
+        st.subheader("🔴 Top SELL")
+        sell_df = (
+            df[df["Signal"] == "SELL"]
+            .sort_values("Confidence", ascending=False)
+            .head(10)
+        )
+        st.dataframe(
+            sell_df,
+            use_container_width=True,
+            hide_index=True
+        )
+
+    st.subheader("Market Summary")
+
+    for symbol, result in results.items():
+        with st.expander(symbol):
+            st.write(result["market"])
+            st.write(result["signal"])
+
 elif page == "🏢 F&O Companies":
 
     st.header("🏢 F&O Companies")
@@ -68,8 +103,14 @@ elif page == "🏢 F&O Companies":
         sorted(oracle.indices.fno_symbols)
     )
 
-    st.success(company)
-    st.info("Company Analysis coming next.")
+    st.success(f"Selected Company : {company}")
+
+    if oracle.indices.is_fno_symbol(company):
+        st.write("✅ F&O Eligible Company")
+    else:
+        st.write("❌ Not an F&O Company")
+
+    st.info("Company AI Analysis will be added in the next step.")
 
 elif page == "🟢 Buy Signals":
 
@@ -86,12 +127,3 @@ elif page == "🔴 Sell Signals":
     sell_df = df[df["Signal"] == "SELL"]
 
     st.dataframe(sell_df, use_container_width=True)
-
-if page == "📈 Market Overview":
-
-    st.subheader("Market Summary")
-
-    for symbol, result in results.items():
-        with st.expander(symbol):
-            st.write(result["market"])
-            st.write(result["signal"])
