@@ -60,18 +60,8 @@ for symbol, result in results.items():
         "Probability": signal.probability,
         "Reason": signal.reason,
     })
-
+    
 df = pd.DataFrame(rows)
-
-st.sidebar.divider()
-
-st.sidebar.subheader("🏢 F&O Companies")
-
-company = st.sidebar.selectbox(
-    "Select Company",
-    sorted(oracle.indices.fno_symbols)
-)
-
 # ---------------- Pages ----------------
 
 if page == "📈 Market Overview":
