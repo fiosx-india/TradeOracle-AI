@@ -105,6 +105,15 @@ elif page == "🏢 F&O Companies":
 
     st.success(f"Selected Company : {company}")
 
+    st.header(company)
+
+    st.success(f"Selected Company : {company}")
+
+    if oracle.indices.is_fno_symbol(company):
+        st.success("✅ F&O Eligible Company")
+
+    st.info("Company AI Analysis coming soon.")
+
     if oracle.indices.is_fno_symbol(company):
         st.write("✅ F&O Eligible Company")
     else:
