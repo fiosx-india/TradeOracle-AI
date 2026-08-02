@@ -26,6 +26,9 @@ page = st.sidebar.radio(
     ]
 )
 
+oracle = TradeOracle()
+results = oracle.analyze()
+
 st.sidebar.divider()
 
 st.sidebar.subheader("🏢 F&O Companies")
@@ -34,9 +37,6 @@ company = st.sidebar.selectbox(
     "Select Company",
     sorted(oracle.indices.fno_symbols)
 )
-
-oracle = TradeOracle()
-results = oracle.analyze()
 
 if not results:
     st.error("No market data available.")
