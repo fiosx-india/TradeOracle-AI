@@ -146,19 +146,33 @@ elif page == "🏢 F&O Companies":
         st.error("❌ Not an F&O Company")
 
     st.info("Company AI Analysis coming soon.")
-    
+
 elif page == "🟢 Buy Signals":
 
     st.header("🟢 Buy Signals")
 
-    buy_df = df[df["Signal"] == "BUY"]
+    buy_df = (
+        df[df["Signal"] == "BUY"]
+        .sort_values("Confidence", ascending=False)
+    )
 
-    st.dataframe(buy_df, use_container_width=True)
+    st.dataframe(
+        buy_df,
+        use_container_width=True,
+        hide_index=True
+    )
 
 elif page == "🔴 Sell Signals":
 
     st.header("🔴 Sell Signals")
 
-    sell_df = df[df["Signal"] == "SELL"]
+    sell_df = (
+        df[df["Signal"] == "SELL"]
+        .sort_values("Confidence", ascending=False)
+    )
 
-    st.dataframe(sell_df, use_container_width=True)
+    st.dataframe(
+        sell_df,
+        use_container_width=True,
+        hide_index=True
+    )
