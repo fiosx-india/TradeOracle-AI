@@ -250,8 +250,16 @@ class IndicesEngine:
                         if symbol not in self.indices:
                             self.indices[symbol] = IndexData(
                                 symbol=symbol,
-                                name=symbol
-                            )              
+                                name=symbol,
+                                last_price=float((row.get("LTP") or "0").replace(",", "")),
+                                change=float((row.get("CHANGE") or "0").replace(",", "")),
+                                change_percent=float((row.get("% CHANGE") or "0").replace(",", "")),
+                                open_price=float((row.get("OPEN") or "0").replace(",", "")),
+                                high_price=float((row.get("HIGH") or "0").replace(",", "")),
+                                low_price=float((row.get("LOW") or "0").replace(",", "")),
+                                previous_close=float((row.get("PREV. CLOSE") or "0").replace(",", "")),
+                                volume=int(float((row.get("VOLUME (shares)") or "0").replace(",", "")))
+                            )
 
         except Exception as error:
             print(f"F&O CSV Load Error: {error}")
