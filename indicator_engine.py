@@ -212,4 +212,19 @@ class IndicatorEngine:
         Analyze all technical indicators.
         """
 
-        return IndicatorResult()
+        result = IndicatorResult()
+
+        # Default values until historical market data is available
+        result.ema20 = 0.0
+        result.ema50 = 0.0
+        result.sma20 = 0.0
+        result.sma50 = 0.0
+        result.rsi = 0.0
+        result.macd = 0.0
+        result.signal_line = 0.0
+        result.vwap = 0.0
+        result.atr = 0.0
+        result.adx = 0.0
+        result.obv = 0.0
+
+        return result
