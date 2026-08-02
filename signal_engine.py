@@ -27,6 +27,7 @@ class SignalResult:
 
 class SignalEngine:
     def __init__(self):
+        self.market = MarketAnalyzer()
         pass
 
     def generate(self, market, news):
@@ -38,7 +39,8 @@ class SignalEngine:
 
         result.market_score = market.market_score
         result.news_score = news.total_score
-
+        market = self.market.analyze(index_data)
+        
         if news.overall_sentiment == "POSITIVE":
             bullish += 20
 
