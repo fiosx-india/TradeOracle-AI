@@ -81,26 +81,46 @@ if page == "📈 Market Overview":
 
     with col1:
         st.subheader("🟢 Top BUY")
+
         buy_df = (
             df[df["Signal"] == "BUY"]
             .sort_values("Confidence", ascending=False)
             .head(10)
         )
+
         st.dataframe(
-            buy_df,
+            buy_df[
+                [
+                    "Index",
+                    "Last Price",
+                    "Confidence",
+                    "Probability",
+                    "Reason"
+                ]
+            ],
             use_container_width=True,
             hide_index=True
         )
 
     with col2:
         st.subheader("🔴 Top SELL")
+
         sell_df = (
             df[df["Signal"] == "SELL"]
             .sort_values("Confidence", ascending=False)
             .head(10)
         )
+
         st.dataframe(
-            sell_df,
+            sell_df[
+                [
+                    "Index",
+                    "Last Price",
+                    "Confidence",
+                    "Probability",
+                    "Reason"
+                ]
+            ],
             use_container_width=True,
             hide_index=True
         )
@@ -113,20 +133,8 @@ if page == "📈 Market Overview":
             st.write(result["signal"])
 
 elif page == "🏢 F&O Companies":
-    
-    company = st.sidebar.selectbox(
-        "Select Company",
-        sorted(oracle.indices.fno_symbols)
-    )
 
     st.header("🏢 F&O Companies")
-    
-    company = st.sidebar.selectbox(
-        "Select Company",
-        sorted(oracle.indices.fno_symbols)
-    )
-
-    st.success(f"Selected Company : {company}")
 
     st.header(company)
 
@@ -134,16 +142,11 @@ elif page == "🏢 F&O Companies":
 
     if oracle.indices.is_fno_symbol(company):
         st.success("✅ F&O Eligible Company")
+    else:
+        st.error("❌ Not an F&O Company")
 
     st.info("Company AI Analysis coming soon.")
-
-    if oracle.indices.is_fno_symbol(company):
-        st.write("✅ F&O Eligible Company")
-    else:
-        st.write("❌ Not an F&O Company")
-
-    st.info("Company AI Analysis will be added in the next step.")
-
+    
 elif page == "🟢 Buy Signals":
 
     st.header("🟢 Buy Signals")
