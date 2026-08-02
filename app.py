@@ -26,6 +26,15 @@ page = st.sidebar.radio(
     ]
 )
 
+st.sidebar.divider()
+
+st.sidebar.subheader("🏢 F&O Companies")
+
+company = st.sidebar.selectbox(
+    "Select Company",
+    sorted(oracle.indices.fno_symbols)
+)
+
 oracle = TradeOracle()
 results = oracle.analyze()
 
@@ -53,6 +62,15 @@ for symbol, result in results.items():
     })
 
 df = pd.DataFrame(rows)
+
+st.sidebar.divider()
+
+st.sidebar.subheader("🏢 F&O Companies")
+
+company = st.sidebar.selectbox(
+    "Select Company",
+    sorted(oracle.indices.fno_symbols)
+)
 # ---------------- Pages ----------------
 
 if page == "📈 Market Overview":
@@ -95,9 +113,14 @@ if page == "📈 Market Overview":
             st.write(result["signal"])
 
 elif page == "🏢 F&O Companies":
+    
+    company = st.sidebar.selectbox(
+        "Select Company",
+        sorted(oracle.indices.fno_symbols)
+    )
 
     st.header("🏢 F&O Companies")
-
+    
     company = st.sidebar.selectbox(
         "Select Company",
         sorted(oracle.indices.fno_symbols)
