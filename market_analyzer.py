@@ -72,6 +72,26 @@ class MarketAnalyzer:
         result.atr = indicator.atr
         result.adx = indicator.adx
         
+        # ---------- Indicator Score ----------
+
+        if result.rsi >= 60:
+            result.bullish_score += 10
+        elif result.rsi <= 40:
+            result.bearish_score += 10
+
+        if result.ema20 > result.ema50:
+            result.bullish_score += 10
+        elif result.ema20 < result.ema50:
+            result.bearish_score += 10
+
+        if result.macd > result.signal_line:
+            result.bullish_score += 10
+        elif result.macd < result.signal_line:
+            result.bearish_score += 10
+
+        if result.adx >= 25:
+            result.strength += 10
+            
         # ---------- Trend ----------
         if index_data.last_price > index_data.open_price:
             result.trend = "BULLISH"
