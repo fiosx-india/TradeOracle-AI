@@ -46,6 +46,27 @@ class SignalEngine:
         elif news.overall_sentiment == "NEGATIVE":
             bearish += 20
 
+        # ---------- Technical Indicator Confirmation ----------
+
+                if market.rsi >= 60:
+                    bullish += 10
+                elif market.rsi <= 40:
+                    bearish += 10
+
+                if market.ema20 > market.ema50:
+                    bullish += 10
+                elif market.ema20 < market.ema50:
+                    bearish += 10
+
+                if market.macd > market.signal_line:
+                    bullish += 10
+                elif market.macd < market.signal_line:
+                    bearish += 10
+
+                if market.adx >= 25:
+                    bullish += 5
+                    bearish += 5
+
         if bullish >= bearish + 15:
 
             result.signal = "BUY"
@@ -72,5 +93,13 @@ class SignalEngine:
             result.expected_time = "15m"
             result.reason = "No clear market direction"
             result.risk_level = "HIGH"
+
+            if result.signal == "BUY":
+                result.target = market.resistance
+                result.stoploss = market.support
+
+            elif result.signal == "SELL":
+                result.target = market.support
+                result.stoploss = market.resistance
 
         return result
