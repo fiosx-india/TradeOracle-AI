@@ -31,6 +31,16 @@ class TradeOracle:
 
         market_reports = self.market.analyze_all(market_data)
 
+        self.news.clear()
+
+        self.news.add_news(
+            title="Market opens strong",
+            source="NSE",
+            category="Market",
+            sentiment="POSITIVE",
+            impact_score=75,
+        )
+
         news_report = self.news.analyze()
 
         for symbol in market_data:
