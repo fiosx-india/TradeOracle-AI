@@ -181,6 +181,43 @@ class IndicesEngine:
         except Exception as error:
             print(f"Indices CSV Load Error: {error}")
 
+
+    def load_summary_csv(self):
+
+        if self.summary_csv is None:
+            return
+
+        try:
+            with open(self.summary_csv, newline="", encoding="utf-8-sig") as file:
+
+                reader = csv.DictReader(file)
+
+                for row in reader:
+
+                    index_id = (row.get("IndexID") or "").strip().upper()
+
+                    if index_id not in ("SENSEX", "BANKEX"):
+                        continue
+
+                    self.update_index(
+                        index_id,
+                        {
+                            "last_price": float((row.get("ClosePrice") or "0").replace(",", "")),
+                            "change": float((row.get("NetChange") or "0").replace(",", "")),
+                            "change_percent": float((row.get("PercentChange") or "0").replace(",", "")),
+                            "open_price": float((row.get("OpenPrice") or "0").replace(",", "")),
+                            "high_price": float((row.get("HighPrice") or "0").replace(",", "")),
+                            "low_price": float((row.get("LowPrice") or "0").replace(",", "")),
+                            "previous_close": float((row.get("PreviousClose") or "0").replace(",", "")),
+                        },
+                    )
+
+            print(f"Loaded Summary CSV: {self.summary_csv.name}")
+
+        except Exception as error:
+            print(f"Summary CSV Load Error: {error}")
+            
+
     def load_fno_csv(self):
 
         self.fno_symbols = []
