@@ -201,16 +201,17 @@ class IndicesEngine:
 
                     self.update_index(
                         index_id,
-                        {
-                            "last_price": float((row.get("ClosePrice") or "0").replace(",", "")),
-                            "change": float((row.get("NetChange") or "0").replace(",", "")),
-                            "change_percent": float((row.get("PercentChange") or "0").replace(",", "")),
-                            "open_price": float((row.get("OpenPrice") or "0").replace(",", "")),
-                            "high_price": float((row.get("HighPrice") or "0").replace(",", "")),
-                            "low_price": float((row.get("LowPrice") or "0").replace(",", "")),
-                            "previous_close": float((row.get("PreviousClose") or "0").replace(",", "")),
-                        },
-                    )
+                            {
+                                "last_price": close_price,
+                                "change": change,
+                                "change_percent": change_percent,
+                                "open_price": float((row.get("OpenPrice") or "0").replace(",", "")),
+                                "high_price": float((row.get("HighPrice") or "0").replace(",", "")),
+                                "low_price": float((row.get("LowPrice") or "0").replace(",", "")),
+                                "previous_close": previous_close,
+                                
+                            },
+                        )
 
             print(f"Loaded Summary CSV: {self.summary_csv.name}")
 
