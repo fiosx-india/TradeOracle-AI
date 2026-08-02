@@ -8,6 +8,7 @@ Analyze Indian market trend, momentum, volume and strength.
 
 from dataclasses import dataclass
 from typing import Dict
+from indicator_engine import IndicatorEngine
 
 
 @dataclass
