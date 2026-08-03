@@ -24,8 +24,11 @@ class IndexData:
     low_price: float = 0.0
     previous_close: float = 0.0
     volume: int = 0
+    close_prices: List[float] = None
+    high_prices: List[float] = None
+    low_prices: List[float] = None
+    volumes: List[int] = None
     timestamp: Optional[datetime] = None
-
 
 class IndicesEngine:
     def __init__(self):
@@ -72,6 +75,29 @@ class IndicesEngine:
         item.low_price = data.get("low_price", item.low_price)
         item.previous_close = data.get("previous_close", item.previous_close)
         item.volume = data.get("volume", item.volume)
+        
+        if item.close_prices is None:
+            item.close_prices = []
+
+        if item.high_prices is None:
+            item.high_prices = []
+
+        if item.low_prices is None:
+            item.low_prices = []
+
+        if item.volumes is None:
+            item.volumes = []
+
+        item.close_prices.append(item.last_price)
+        item.high_prices.append(item.high_price)
+        item.low_prices.append(item.low_price)
+        item.volumes.append(item.volume)
+
+        item.close_prices = item.close_prices[-100:]
+        item.high_prices = item.high_prices[-100:]
+        item.low_prices = item.low_prices[-100:]
+        item.volumes = item.volumes[-100:]
+
         item.timestamp = datetime.now()
 
     def get_symbols(self) -> List[str]:
