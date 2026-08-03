@@ -103,5 +103,5 @@ class SignalEngine:
             result.target = market.support
             result.stoploss = market.resistance
             
-            return result
+        return result
 
