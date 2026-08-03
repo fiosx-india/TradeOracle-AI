@@ -217,26 +217,72 @@ class IndicatorEngine:
         # Historical data not available yet.
         # Use current market snapshot as placeholder values.
 
-        result.ema20 = market_data.last_price
-        result.ema50 = market_data.last_price
+        result.ema20 = self.calculate_ema(market_data.close_prices, 20)
+        result.ema50 = self.calculate_ema(market_data.close_prices, 50)
 
-        result.sma20 = market_data.last_price
-        result.sma50 = market_data.last_price
+        result.sma20 = self.calculate_sma(market_data.close_prices, 20)
+        result.sma50 = self.calculate_sma(market_data.close_prices, 50)
 
-        result.rsi = 50.0
+        result.rsi = self.calculate_rsi(market_data.close_prices)
 
-        result.macd = 0.0
-        result.signal_line = 0.0
-
-        result.vwap = market_data.last_price
-
-        result.atr = max(
-            0.0,
-            market_data.high_price - market_data.low_price
+        result.macd, result.signal_line = self.calculate_macd(
+            market_data.close_prices
         )
 
-        result.adx = 0.0
+        result.vwap = self.calculate_vwap(
+            market_data.close_prices,
+            market_data.volumes
+        )
 
-        result.obv = market_data.volume
+        result.atr = self.calculate_atr(
+            market_data.high_prices,
+            market_data.low_prices,
+            market_data.close_prices
+        )
+
+        result.adx = self.calculate_adx(
+            market_data.high_prices,
+            market_data.low_prices,
+            market_data.close_prices
+        )
+
+        result.obv = self.calculate_obv(
+            market_data.close_prices,
+            market_data.volumes
+        )
+
+        result.ema20 = self.calculate_ema(market_data.close_prices, 20)
+        result.ema50 = self.calculate_ema(market_data.close_prices, 50)
+
+        result.sma20 = self.calculate_sma(market_data.close_prices, 20)
+        result.sma50 = self.calculate_sma(market_data.close_prices, 50)
+
+        result.rsi = self.calculate_rsi(market_data.close_prices)
+
+        result.macd, result.signal_line = self.calculate_macd(
+            market_data.close_prices
+        )
+
+        result.vwap = self.calculate_vwap(
+            market_data.close_prices,
+            market_data.volumes
+        )
+
+        result.atr = self.calculate_atr(
+            market_data.high_prices,
+            market_data.low_prices,
+            market_data.close_prices
+        )
+
+        result.adx = self.calculate_adx(
+            market_data.high_prices,
+            market_data.low_prices,
+            market_data.close_prices
+        )
+
+        result.obv = self.calculate_obv(
+            market_data.close_prices,
+            market_data.volumes
+        )
 
         return result
