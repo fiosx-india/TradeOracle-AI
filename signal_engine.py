@@ -33,6 +33,7 @@ class SignalEngine:
     def generate(self, market, news):
 
         result = SignalResult()
+        reasons = []
 
         bullish = market.bullish_score
         bearish = market.bearish_score
@@ -42,47 +43,61 @@ class SignalEngine:
         
         if news.overall_sentiment == "POSITIVE":
             bullish += 20
+            reasons.append("Positive News")
 
         elif news.overall_sentiment == "NEGATIVE":
             bearish += 20
+            reasons.append("Negative News")
 
+        else:
+            reasons.append("Neutral News")
         # ---------- Technical Indicator Confirmation ----------
 
         if market.rsi >= 60:
             bullish += 10
+            reasons.append("RSI Bullish")
+
         elif market.rsi <= 40:
             bearish += 10
+            reasons.append("RSI Bearish")
 
         if market.ema20 > market.ema50:
             bullish += 10
+            reasons.append("EMA Bullish Cross")
+
         elif market.ema20 < market.ema50:
             bearish += 10
+            reasons.append("EMA Bearish Cross")
 
         if market.macd > market.signal_line:
             bullish += 10
+            reasons.append("MACD Bullish")
+
         elif market.macd < market.signal_line:
             bearish += 10
+            reasons.append("MACD Bearish")
 
         if market.adx >= 25:
             bullish += 5
             bearish += 5
+            reasons.append("Strong Trend (ADX)")
 
         if bullish >= bearish + 15:
-
+            
             result.signal = "BUY"
             result.confidence = min(95, bullish)
-            result.probability = min(95, bullish)
+            result.probability = min(95, (bullish + market.market_score) / 2)
             result.expected_time = "30m"
-            result.reason = "Bullish market with positive news"
+            result.reason = ", ".join(reasons)
             result.risk_level = "LOW"
 
         elif bearish >= bullish + 15:
-
+            
             result.signal = "SELL"
             result.confidence = min(95, bearish)
-            result.probability = min(95, bearish)
+            result.probability = min(95, (bearish + market.market_score) / 2)
             result.expected_time = "30m"
-            result.reason = "Bearish market with negative news"
+            result.reason = ", ".join(reasons)
             result.risk_level = "LOW"
 
         else:
@@ -91,9 +106,13 @@ class SignalEngine:
             result.confidence = 50
             result.probability = 50
             result.expected_time = "15m"
-            result.reason = "No clear market direction"
-            result.risk_level = "HIGH"
 
+            if reasons:
+                result.reason = ", ".join(reasons)
+            else:
+                result.reason = "No clear market direction"
+
+            result.risk_level = "HIGH"
 
         if result.signal == "BUY":
             result.target = market.resistance
