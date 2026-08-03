@@ -102,4 +102,6 @@ class SignalEngine:
         elif result.signal == "SELL":
             result.target = market.support
             result.stoploss = market.resistance
+            
+            return result
 
