@@ -3,11 +3,17 @@ import streamlit as st
 import pandas as pd
 
 from oracle_core import TradeOracle
+from streamlit_autorefresh import st_autorefresh
 
 st.set_page_config(
     page_title="TradeOracle AI",
     page_icon="📈",
     layout="wide"
+)
+
+st_autorefresh(
+    interval=60 * 1000,
+    key="tradeoracle_refresh"
 )
 
 st.title("📈 TradeOracle AI Dashboard")
