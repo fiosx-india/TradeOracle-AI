@@ -207,6 +207,7 @@ elif page == "🏢 F&O Companies":
                 st.metric("Confidence", f"{signal.confidence}%")
                 st.metric("Probability", f"{signal.probability}%")
                 st.metric("Risk", signal.risk_level)
+                st.metric("Market Score", f"{signal.market_score:.2f}")
 
             st.divider()
 
