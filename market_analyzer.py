@@ -23,7 +23,8 @@ class MarketAnalysis:
     # Price Action
     breakout: bool = False
     breakdown: bool = False
-
+    
+    last_price: float = 0.0
     support: float = 0.0
     resistance: float = 0.0
 
@@ -71,6 +72,7 @@ class MarketAnalyzer:
         result.vwap = indicator.vwap
         result.atr = indicator.atr
         result.adx = indicator.adx
+        result.last_price = index_data.last_price
         
         # ---------- Indicator Score ----------
 
