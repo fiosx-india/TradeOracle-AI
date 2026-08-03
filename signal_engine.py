@@ -24,6 +24,14 @@ class SignalResult:
 
     target: float = 0.0
     stoploss: float = 0.0
+    
+    entry_price: float = 0.0
+
+    target1: float = 0.0
+    target2: float = 0.0
+    target3: float = 0.0
+
+    risk_reward: float = 0.0
 
 
 class SignalEngine:
