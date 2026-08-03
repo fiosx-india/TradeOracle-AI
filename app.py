@@ -179,9 +179,8 @@ elif page == "🏢 F&O Companies":
     st.divider()
     
     company_result = results.get(selected_company)
-
-            if company_result:
-
+        if company_result:
+            
             idx = company_result["index"]
             market = company_result["market"]
             signal = company_result["signal"]
