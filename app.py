@@ -216,8 +216,8 @@ elif page == "🏢 F&O Companies":
             st.subheader("🤖 AI Reason")
             st.info(signal.reason)
 
-        else:
-            st.warning("No analysis available for this company.")
+     else:
+        st.warning("No analysis available for this company.")
 
 elif page == "🟢 Buy Signals":
 
