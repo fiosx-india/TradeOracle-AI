@@ -94,7 +94,7 @@ class SignalEngine:
             
             result.signal = "BUY"
             result.confidence = min(95, bullish)
-            result.probability = min(95, (bullish + market.market_score) / 2)
+            result.probability = min(95, max(50, (bullish + abs(market.market_score)) / 2))
             result.expected_time = "30m"
             result.reason = ", ".join(reasons)
             result.risk_level = "LOW"
@@ -103,7 +103,7 @@ class SignalEngine:
             
             result.signal = "SELL"
             result.confidence = min(95, bearish)
-            result.probability = min(95, (bearish + market.market_score) / 2)
+            result.probability = min(95, max(50, (bearish + abs(market.market_score)) / 2))
             result.expected_time = "30m"
             result.reason = ", ".join(reasons)
             result.risk_level = "LOW"
