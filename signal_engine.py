@@ -123,12 +123,39 @@ class SignalEngine:
             result.risk_level = "HIGH"
 
         if result.signal == "BUY":
-            result.target = market.resistance
+
+            result.entry_price = market.last_price
             result.stoploss = market.support
 
+            result.target1 = market.resistance
+            result.target2 = market.resistance * 1.01
+            result.target3 = market.resistance * 1.02
+
+            result.target = result.target1
+
+            risk = result.entry_price - result.stoploss
+            reward = result.target1 - result.entry_price
+
+            if risk > 0:
+                result.risk_reward = round(reward / risk, 2)
+
+
         elif result.signal == "SELL":
-            result.target = market.support
+
+            result.entry_price = market.last_price
             result.stoploss = market.resistance
+
+            result.target1 = market.support
+            result.target2 = market.support * 0.99
+            result.target3 = market.support * 0.98
+
+            result.target = result.target1
+
+            risk = result.stoploss - result.entry_price
+            reward = result.entry_price - result.target1
+
+            if risk > 0:
+                result.risk_reward = round(reward / risk, 2)
             
         return result
 
