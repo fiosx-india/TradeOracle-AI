@@ -1,1 +1,1 @@
-web: python3 oracle_core.py
+web: streamlit run app.py --server.port=$PORT --server.address=0.0.0.0
