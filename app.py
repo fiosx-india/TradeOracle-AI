@@ -175,11 +175,50 @@ elif page == "🏢 F&O Companies":
         st.success("✅ F&O Eligible Company")
     else:
         st.error("❌ Not an F&O Company")
+        
+    st.divider()
+    
+    company_result = results.get(selected_company)
 
-    st.info(
-        "Technical analysis, market trend, AI prediction and trading signals "
-        "for this company will be available soon."
-    )
+        if company_result:
+
+            idx = company_result["index"]
+            market = company_result["market"]
+            signal = company_result["signal"]
+
+            st.subheader(f"📈 {selected_company}")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.metric("Last Price", f"{idx.last_price:,.2f}")
+                st.metric("Change %", f"{idx.change_percent:.2f}%")
+                st.metric("Trend", market.trend)
+                st.metric("Momentum", market.momentum)
+
+            with col2:
+                st.metric("Signal", signal.signal)
+                st.metric("Confidence", f"{signal.confidence}%")
+                st.metric("Probability", f"{signal.probability}%")
+                st.metric("Risk", signal.risk_level)
+
+            st.divider()
+
+            c1, c2 = st.columns(2)
+
+            with c1:
+                st.metric("Target", signal.target)
+
+            with c2:
+                st.metric("Stop Loss", signal.stoploss)
+
+            st.divider()
+
+            st.subheader("🤖 AI Reason")
+            st.info(signal.reason)
+
+        else:
+            st.warning("No analysis available for this company.")
 
 elif page == "🟢 Buy Signals":
 
