@@ -309,9 +309,9 @@ class IndicesEngine:
                                 ),
 
                                 close_prices=[],
-                                    high_prices=[],
-                                    low_prices=[],
-                                    volumes=[],
+                                high_prices=[],
+                                low_prices=[],
+                                volumes=[],
                             )
                         else:
                             self.update_index(
