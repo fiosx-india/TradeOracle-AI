@@ -155,8 +155,15 @@ if page == "📈 Market Overview":
             st.write(f"**Confidence :** {signal.confidence}%")
             st.write(f"**Probability :** {signal.probability}%")
 
-            st.write(f"**Target :** {signal.target}")
-            st.write(f"**Stop Loss :** {signal.stoploss}")
+            st.write(f"**Entry Price :** {signal.entry_price:.2f}")
+
+            st.write(f"**Target 1 :** {signal.target1:.2f}")
+            st.write(f"**Target 2 :** {signal.target2:.2f}")
+            st.write(f"**Target 3 :** {signal.target3:.2f}")
+
+            st.write(f"**Stop Loss :** {signal.stoploss:.2f}")
+
+            st.write(f"**Risk / Reward :** {signal.risk_reward}")
 
             st.write(f"**Reason :** {signal.reason}")
 
@@ -206,10 +213,14 @@ elif page == "🏢 F&O Companies":
             c1, c2 = st.columns(2)
 
             with c1:
-                st.metric("Target", signal.target)
+                st.metric("Entry", f"{signal.entry_price:.2f}")
+                st.metric("Target 1", f"{signal.target1:.2f}")
+                st.metric("Target 2", f"{signal.target2:.2f}")
 
             with c2:
-                st.metric("Stop Loss", signal.stoploss)
+                st.metric("Stop Loss", f"{signal.stoploss:.2f}")
+                st.metric("Target 3", f"{signal.target3:.2f}")
+                st.metric("Risk / Reward", signal.risk_reward)
 
             st.divider()
 
