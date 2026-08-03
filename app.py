@@ -216,11 +216,12 @@ elif page == "🏢 F&O Companies":
                 st.metric("Entry", f"{signal.entry_price:.2f}")
                 st.metric("Target 1", f"{signal.target1:.2f}")
                 st.metric("Target 2", f"{signal.target2:.2f}")
+                st.metric("Expected Time", signal.expected_time)
 
             with c2:
                 st.metric("Stop Loss", f"{signal.stoploss:.2f}")
                 st.metric("Target 3", f"{signal.target3:.2f}")
-                st.metric("Risk / Reward", signal.risk_reward)
+                st.metric("Risk / Reward", f"{signal.risk_reward:.2f}")
 
             st.divider()
 
