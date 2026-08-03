@@ -180,7 +180,7 @@ elif page == "🏢 F&O Companies":
     
     company_result = results.get(selected_company)
 
-        if company_result:
+            if company_result:
 
             idx = company_result["index"]
             market = company_result["market"]
