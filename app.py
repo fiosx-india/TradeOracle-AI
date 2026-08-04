@@ -139,65 +139,90 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
-        # ================= AI Market Report =================
+        # ===================================================
+        # TOP BUY / TOP SELL
+        # ===================================================
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.subheader("🟢 Top BUY")
+
+            st.dataframe(
+                buy_df[
+                    [
+                        "Index",
+                        "Last Price",
+                        "Confidence",
+                        "Probability",
+                        "Reason",
+                    ]
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+
+        with col2:
+            st.subheader("🔴 Top SELL")
+
+            st.dataframe(
+                sell_df[
+                    [
+                        "Index",
+                        "Last Price",
+                        "Confidence",
+                        "Probability",
+                        "Reason",
+                    ]
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+
+
+        # ===================================================
+        # AI MARKET REPORT (FULL WIDTH)
+        # ===================================================
 
         st.subheader("🤖 AI Market Report")
 
-        # ---------------- BUY / SELL ----------------
-
-        buy_df = (
-            df[df["Signal"] == "BUY"]
-            .sort_values(
-                ["Confidence", "Probability"],
-                ascending=False,
-            )
+        report_left, report_right = st.columns(
+            [3.8, 1.2],
+            gap="large"
         )
 
-        sell_df = (
-            df[df["Signal"] == "SELL"]
-            .sort_values(
-                ["Confidence", "Probability"],
-                ascending=False,
+        with report_left:
+
+            st.container(border=True)
+
+            st.markdown("## 🧠 AI Market Summary")
+
+            # உங்கள் Bullish / Bearish / Sideways Summary
+            # (தற்போது உள்ள success(), warning(), error() block)
+
+        with report_right:
+
+            st.container(border=True)
+
+            st.markdown("### 📊 AI Metrics")
+
+            st.metric("Market Mood", market_mood)
+            st.metric("AI Confidence", f"{best_confidence}%")
+
+            st.metric("BUY Signals", buy_count)
+            st.metric("SELL Signals", sell_count)
+
+            st.metric("Best BUY", best_buy)
+            st.metric("Best SELL", best_sell)
+
+            st.metric("News", news_report.overall_sentiment)
+
+            st.metric(
+                "F&O Companies",
+                len(oracle.indices.fno_symbols),
             )
-        )
 
-        with st.container(border=True):
-
-            # More space for AI Summary
-            left, right = st.columns(
-                [3.5, 1.5],
-                gap="large"
-            )
-
-            # ---------- LEFT ----------
-            with left:
-
-                st.markdown("## 🧠 AI Market Summary")
-
-                ...
-                # உங்கள் success / warning / error block
-                ...
-
-            # ---------- RIGHT ----------
-            with right:
-
-                st.markdown("### 📊 AI Metrics")
-
-                st.metric("Market Mood", market_mood)
-                st.metric("AI Confidence", f"{best_confidence}%")
-
-                st.metric("BUY Signals", buy_count)
-                st.metric("SELL Signals", sell_count)
-
-                st.metric("Best BUY", best_buy)
-                st.metric("Best SELL", best_sell)
-
-                st.metric("News", news_report.overall_sentiment)
-
-                st.metric(
-                    "F&O Companies",
-                    len(oracle.indices.fno_symbols)
-                )
+        st.divider()
 
     st.subheader("📊 Market Summary")
 
