@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 st_autorefresh(
-    interval=60 * 1000,
+    interval=60000,   # 60 seconds
     key="tradeoracle_refresh"
 )
 
