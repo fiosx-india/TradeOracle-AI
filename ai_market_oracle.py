@@ -1273,3 +1273,83 @@ class AIMarketOracle:
             reasoning=reasoning,
             timeframes=timeframe_assessments,
         )
+
+    def _collect_analysis_inputs(
+        self,
+    ) -> tuple[
+        dict[str, Any],
+        dict[str, MarketAnalysis],
+        NewsAnalysis,
+    ]:
+        """
+        Collect the current TradeOracle analysis inputs.
+
+        This method gathers the existing public objects produced by the
+        TradeOracle pipeline without performing any AI processing.
+
+        Returns:
+            A tuple containing:
+
+            - market_data:
+                Mapping of symbol to index data returned by
+                ``TradeOracle.indices.get_all_indices()``.
+
+            - market_reports:
+                Mapping of symbol to ``MarketAnalysis`` produced by
+                ``MarketAnalyzer.analyze_all()``.
+
+            - news_report:
+                The current ``NewsAnalysis`` produced by
+                ``NewsAnalyzer.analyze()``.
+
+        Raises:
+            RuntimeError:
+                If market data cannot be collected.
+        """
+        self._logger.debug("Collecting TradeOracle analysis inputs.")
+
+        market_data = self._indices.get_all_indices()
+
+        if not market_data:
+            self._logger.warning("No market data available from IndicesEngine.")
+            raise RuntimeError("No market data available.")
+
+        market_reports = self._market.analyze_all(market_data)
+
+        news_report = self._news.analyze()
+
+        self._logger.debug(
+            "TradeOracle analysis inputs collected.",
+            extra={
+                "symbols": len(market_data),
+                "news_items": news_report.news_count,
+            },
+        )
+
+        return market_data, market_reports, news_report
+
+
+    def _update_internal_state(
+        self,
+        symbol: str,
+        insight: AIInsight,
+    ) -> None:
+        """
+        Update the internal AIMarketOracle state with the latest analysis result.
+
+        This method performs only internal cache and state updates. It does not
+        invoke extensions, perform additional analysis, or modify any external
+        TradeOracle components.
+
+        Args:
+            symbol:
+                Trading symbol associated with the analysis.
+
+            insight:
+                The completed AI insight to cache.
+        """
+        self._latest_insights[symbol] = insight
+        self._market_contexts[symbol] = insight.context
+        self._analysis_count += 1
+        self._last_analysis_at = datetime.utcnow()
+
