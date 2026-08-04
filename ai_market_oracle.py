@@ -294,5 +294,4 @@ SUPPORTED_DECISIONS: Tuple[Decision, ...] = (
     Decision.BUY,
     Decision.SELL,
     Decision.HOLD,
-  )
-
+)
