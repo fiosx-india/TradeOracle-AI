@@ -139,6 +139,24 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
+        # ================================
+        # 🤖 AI Workspace (Future Expansion)
+        # ================================
+
+        st.subheader("🤖 AI Workspace")
+
+        ai_col1, ai_col2 = st.columns([1, 1])
+
+        with ai_col1:
+            st.info("Reserved for AI Assistant")
+
+        with ai_col2:
+            st.info("Reserved for Future Modules")
+
+        st.divider()
+
+        # Existing Section
+    
     st.subheader("📊 Market Summary")
 
     for symbol, result in results.items():
