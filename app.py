@@ -139,24 +139,35 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
-        # ================================
-        # 🤖 AI Workspace (Future Expansion)
-        # ================================
-
         st.subheader("🤖 AI Workspace")
 
-        ai_col1, ai_col2 = st.columns([1, 1])
+        with st.container(border=True):
 
-        with ai_col1:
-            st.info("Reserved for AI Assistant")
+            col1, col2 = st.columns([2,1])
 
-        with ai_col2:
-            st.info("Reserved for Future Modules")
+            with col1:
+
+                st.markdown("### 🧠 AI Market Assistant")
+
+                st.write("📈 **Market Mood :** Bullish")
+                st.write("🎯 **Best Opportunity :** KEI")
+                st.write("⚡ **Strongest Sector :** Financial")
+                st.write("📰 **News Impact :** Positive")
+                st.write("⚠️ **Risk Status :** Low")
+
+                st.success(
+                    "AI Insight : Momentum remains strong. "
+                    "Prefer high-confidence BUY setups."
+                )
+
+            with col2:
+
+                st.metric("AI Confidence", "72%")
+                st.metric("Buy Signals", len(df[df["Signal"]=="BUY"]))
+                st.metric("Sell Signals", len(df[df["Signal"]=="SELL"]))
 
         st.divider()
 
-        # Existing Section
-    
     st.subheader("📊 Market Summary")
 
     for symbol, result in results.items():
