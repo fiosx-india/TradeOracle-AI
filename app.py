@@ -139,32 +139,83 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
+        # ================= AI Workspace =================
+
         st.subheader("🤖 AI Workspace")
+
+        # BUY / SELL Data
+        buy_df = (
+            df[df["Signal"] == "BUY"]
+            .sort_values("Confidence", ascending=False)
+        )
+
+        sell_df = (
+            df[df["Signal"] == "SELL"]
+            .sort_values("Confidence", ascending=False)
+        )
+
+        # Best Opportunity
+        if not buy_df.empty:
+            best = buy_df.iloc[0]
+            best_company = best["Index"]
+            best_confidence = best["Confidence"]
+            market_mood = "Bullish"
+        else:
+            best_company = "None"
+            best_confidence = 0
+            market_mood = "Bearish"
+
+        # News
+        news_report = next(iter(results.values()))["news"]
+
+        news_impact = news_report.overall_sentiment.title()
+
+        # AI Insight
+        if market_mood == "Bullish":
+            insight = (
+                f"{best_company} currently has the strongest BUY setup "
+                f"with {best_confidence}% confidence."
+            )
+        else:
+            insight = (
+                "No strong BUY opportunity detected. "
+                "Market remains defensive."
+            )
 
         with st.container(border=True):
 
-            col1, col2 = st.columns([2,1])
+            left, right = st.columns([2.2, 1])
 
-            with col1:
+            with left:
 
                 st.markdown("### 🧠 AI Market Assistant")
 
-                st.write("📈 **Market Mood :** Bullish")
-                st.write("🎯 **Best Opportunity :** KEI")
-                st.write("⚡ **Strongest Sector :** Financial")
-                st.write("📰 **News Impact :** Positive")
-                st.write("⚠️ **Risk Status :** Low")
+                st.write(f"📈 **Market Mood :** {market_mood}")
 
-                st.success(
-                    "AI Insight : Momentum remains strong. "
-                    "Prefer high-confidence BUY setups."
+                st.write(f"🎯 **Best Opportunity :** {best_company}")
+
+                st.write(f"📰 **News Impact :** {news_impact}")
+
+                st.write("⚠️ **Risk Status :** Dynamic")
+
+                st.success(insight)
+
+            with right:
+
+                st.metric(
+                    "AI Confidence",
+                    f"{best_confidence}%"
                 )
 
-            with col2:
+                st.metric(
+                    "BUY Signals",
+                    len(buy_df)
+                )
 
-                st.metric("AI Confidence", "72%")
-                st.metric("Buy Signals", len(df[df["Signal"]=="BUY"]))
-                st.metric("Sell Signals", len(df[df["Signal"]=="SELL"]))
+                st.metric(
+                    "SELL Signals",
+                    len(sell_df)
+                )
 
         st.divider()
 
