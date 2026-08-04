@@ -139,82 +139,110 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
-        # ================= AI Workspace =================
+        # ================= AI Market Report =================
 
-        st.subheader("🤖 AI Workspace")
+        st.subheader("🤖 AI Market Report")
 
-        # BUY / SELL Data
+        # ---------------- BUY / SELL ----------------
+
         buy_df = (
             df[df["Signal"] == "BUY"]
-            .sort_values("Confidence", ascending=False)
+            .sort_values(
+                ["Confidence", "Probability"],
+                ascending=False,
+            )
         )
 
         sell_df = (
             df[df["Signal"] == "SELL"]
-            .sort_values("Confidence", ascending=False)
+            .sort_values(
+                ["Confidence", "Probability"],
+                ascending=False,
+            )
         )
 
-        # Best Opportunity
-        if not buy_df.empty:
-            best = buy_df.iloc[0]
-            best_company = best["Index"]
-            best_confidence = best["Confidence"]
-            market_mood = "Bullish"
-        else:
-            best_company = "None"
-            best_confidence = 0
-            market_mood = "Bearish"
+        # ---------------- Main Report ----------------
 
-        # News
         news_report = next(iter(results.values()))["news"]
 
-        news_impact = news_report.overall_sentiment.title()
+        buy_count = len(buy_df)
+        sell_count = len(sell_df)
 
-        # AI Insight
-        if market_mood == "Bullish":
-            insight = (
-                f"{best_company} currently has the strongest BUY setup "
-                f"with {best_confidence}% confidence."
-            )
+        if buy_count > sell_count:
+            market_mood = "🟢 Bullish"
+
+        elif sell_count > buy_count:
+            market_mood = "🔴 Bearish"
+
         else:
-            insight = (
-                "No strong BUY opportunity detected. "
-                "Market remains defensive."
-            )
+            market_mood = "🟡 Sideways"
+
+        best_buy = buy_df.iloc[0]["Index"] if not buy_df.empty else "-"
+        best_sell = sell_df.iloc[0]["Index"] if not sell_df.empty else "-"
+
+        best_confidence = (
+            buy_df.iloc[0]["Confidence"]
+            if not buy_df.empty
+            else 0
+        )
 
         with st.container(border=True):
 
-            left, right = st.columns([2.2, 1])
+            c1, c2, c3 = st.columns(3)
 
-            with left:
+            with c1:
+                st.metric("Market Mood", market_mood)
+                st.metric("News", news_report.overall_sentiment)
 
-                st.markdown("### 🧠 AI Market Assistant")
+            with c2:
+                st.metric("Strong BUY", best_buy)
+                st.metric("Strong SELL", best_sell)
 
-                st.write(f"📈 **Market Mood :** {market_mood}")
+            with c3:
+                st.metric("AI Confidence", f"{best_confidence}%")
+                st.metric("F&O Companies", len(oracle.indices.fno_symbols))
 
-                st.write(f"🎯 **Best Opportunity :** {best_company}")
+            st.divider()
 
-                st.write(f"📰 **News Impact :** {news_impact}")
+            st.markdown("### 🧠 AI Summary")
 
-                st.write("⚠️ **Risk Status :** Dynamic")
+            if market_mood.startswith("🟢"):
+                st.success(
+                    f"""
+        Market sentiment is **Bullish**.
 
-                st.success(insight)
+        • Strong BUY Candidate : **{best_buy}**
 
-            with right:
+        • Total BUY Signals : **{buy_count}**
 
-                st.metric(
-                    "AI Confidence",
-                    f"{best_confidence}%"
+        • Positive News : **{news_report.overall_sentiment}**
+
+        AI currently favors bullish opportunities.
+        """
                 )
 
-                st.metric(
-                    "BUY Signals",
-                    len(buy_df)
+            elif market_mood.startswith("🔴"):
+                st.error(
+                    f"""
+        Market sentiment is **Bearish**.
+
+        • Strong SELL Candidate : **{best_sell}**
+
+        • Total SELL Signals : **{sell_count}**
+
+        AI recommends defensive positioning.
+        """
                 )
 
-                st.metric(
-                    "SELL Signals",
-                    len(sell_df)
+            else:
+                st.warning(
+                    """
+        Market is currently moving sideways.
+
+        No strong directional advantage.
+
+        Wait for confirmation before entering trades.
+        """
                 )
 
         st.divider()
