@@ -649,3 +649,57 @@ class AIMarketOracle:
         """
         return tuple(self._extensions)
 
+    def _build_market_context(
+        self,
+        symbol: str,
+        market: MarketAnalysis,
+        news: NewsAnalysis,
+        signal: SignalResult,
+    ) -> MarketContext:
+        """
+        Construct a MarketContext instance from the existing TradeOracle public
+        analysis objects.
+
+        Args:
+            symbol:
+                Market symbol.
+
+            market:
+                Technical market analysis produced by ``MarketAnalyzer``.
+
+            news:
+                News analysis produced by ``NewsAnalyzer``.
+
+            signal:
+                Trading signal produced by ``SignalEngine``.
+
+        Returns:
+            A populated ``MarketContext`` describing the current market state.
+        """
+        if market.market_score >= 20:
+            regime = MarketRegime.BULL
+        elif market.market_score <= -20:
+            regime = MarketRegime.BEAR
+        elif market.strength >= 30:
+            regime = MarketRegime.VOLATILE
+        else:
+            regime = MarketRegime.SIDEWAYS
+
+        return MarketContext(
+            symbol=symbol,
+            timestamp=datetime.utcnow(),
+            regime=regime,
+            trend=market.trend,
+            momentum=market.momentum,
+            strength=market.strength,
+            market_score=market.market_score,
+            bullish_score=market.bullish_score,
+            bearish_score=market.bearish_score,
+            news_score=news.total_score,
+            confidence=signal.confidence,
+            last_price=market.last_price,
+            support=market.support,
+            resistance=market.resistance,
+            volume_status=market.volume_status,
+            risk_level=signal.risk_level,
+        )
