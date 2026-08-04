@@ -295,3 +295,186 @@ SUPPORTED_DECISIONS: Tuple[Decision, ...] = (
     Decision.SELL,
     Decision.HOLD,
 )
+
+class PluginRegistry:
+    """
+    Central registry for TradeOracle AI plugins.
+
+    The registry stores plugin instances by unique name and provides a
+    deterministic execution order. Plugins may optionally implement the
+    following lifecycle methods:
+
+        initialize() -> None
+        before_analysis(context) -> None
+        after_analysis(result) -> None
+        shutdown() -> None
+
+    The registry is thread-safe and may be safely shared across multiple
+    analysis threads.
+    """
+
+    def __init__(self) -> None:
+        from threading import RLock
+
+        self._plugins: dict[str, object] = {}
+        self._lock = RLock()
+
+    def register(self, name: str, plugin: object) -> None:
+        """
+        Register a plugin.
+
+        Args:
+            name:
+                Unique plugin name.
+            plugin:
+                Plugin instance.
+
+        Raises:
+            TypeError:
+                If name or plugin is invalid.
+            ValueError:
+                If the name already exists.
+        """
+        if not isinstance(name, str) or not name.strip():
+            raise TypeError("Plugin name must be a non-empty string.")
+
+        if plugin is None:
+            raise TypeError("Plugin instance cannot be None.")
+
+        key = name.strip()
+
+        with self._lock:
+            if key in self._plugins:
+                raise ValueError(f"Plugin '{key}' is already registered.")
+
+            self._plugins[key] = plugin
+
+    def unregister(self, name: str) -> object:
+        """
+        Remove a registered plugin.
+
+        Args:
+            name:
+                Registered plugin name.
+
+        Returns:
+            Removed plugin instance.
+
+        Raises:
+            KeyError:
+                If the plugin is not registered.
+        """
+        with self._lock:
+            return self._plugins.pop(name)
+
+    def get(self, name: str) -> object:
+        """
+        Retrieve a registered plugin.
+
+        Args:
+            name:
+                Plugin name.
+
+        Returns:
+            Registered plugin instance.
+
+        Raises:
+            KeyError:
+                If the plugin is not registered.
+        """
+        with self._lock:
+            return self._plugins[name]
+
+    def exists(self, name: str) -> bool:
+        """
+        Check whether a plugin exists.
+        """
+        with self._lock:
+            return name in self._plugins
+
+    def names(self) -> tuple[str, ...]:
+        """
+        Return registered plugin names in registration order.
+        """
+        with self._lock:
+            return tuple(self._plugins.keys())
+
+    def plugins(self) -> tuple[object, ...]:
+        """
+        Return registered plugin instances in registration order.
+        """
+        with self._lock:
+            return tuple(self._plugins.values())
+
+    def initialize_all(self) -> None:
+        """
+        Invoke initialize() on every registered plugin that implements it.
+        """
+        with self._lock:
+            plugins = tuple(self._plugins.values())
+
+        for plugin in plugins:
+            method = getattr(plugin, "initialize", None)
+            if callable(method):
+                method()
+
+    def before_analysis(self, context: object) -> None:
+        """
+        Invoke before_analysis() on every compatible plugin.
+        """
+        with self._lock:
+            plugins = tuple(self._plugins.values())
+
+        for plugin in plugins:
+            method = getattr(plugin, "before_analysis", None)
+            if callable(method):
+                method(context)
+
+    def after_analysis(self, result: object) -> None:
+        """
+        Invoke after_analysis() on every compatible plugin.
+        """
+        with self._lock:
+            plugins = tuple(self._plugins.values())
+
+        for plugin in plugins:
+            method = getattr(plugin, "after_analysis", None)
+            if callable(method):
+                method(result)
+
+    def shutdown_all(self) -> None:
+        """
+        Invoke shutdown() on every registered plugin that implements it.
+
+        Plugins are invoked in reverse registration order to mirror the
+        initialization sequence.
+        """
+        with self._lock:
+            plugins = tuple(reversed(tuple(self._plugins.values())))
+
+        for plugin in plugins:
+            method = getattr(plugin, "shutdown", None)
+            if callable(method):
+                method()
+
+    def clear(self) -> None:
+        """
+        Remove all registered plugins.
+        """
+        with self._lock:
+            self._plugins.clear()
+
+    def __len__(self) -> int:
+        with self._lock:
+            return len(self._plugins)
+
+    def __contains__(self, name: object) -> bool:
+        if not isinstance(name, str):
+            return False
+
+        with self._lock:
+            return name in self._plugins
+
+    def __iter__(self):
+        with self._lock:
+            return iter(tuple(self._plugins.items()))
