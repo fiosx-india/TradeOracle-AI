@@ -161,7 +161,27 @@ if page == "📈 Market Overview":
             )
         )
 
-        # ---------------- Main Report ----------------
+        # ================= AI Market Report =================
+
+        st.subheader("🤖 AI Market Report")
+
+        # ---------------- BUY / SELL ----------------
+
+        buy_df = (
+            df[df["Signal"] == "BUY"]
+            .sort_values(
+                ["Confidence", "Probability"],
+                ascending=False,
+            )
+        )
+
+        sell_df = (
+            df[df["Signal"] == "SELL"]
+            .sort_values(
+                ["Confidence", "Probability"],
+                ascending=False,
+            )
+        )
 
         news_report = next(iter(results.values()))["news"]
 
@@ -170,10 +190,8 @@ if page == "📈 Market Overview":
 
         if buy_count > sell_count:
             market_mood = "🟢 Bullish"
-
         elif sell_count > buy_count:
             market_mood = "🔴 Bearish"
-
         else:
             market_mood = "🟡 Sideways"
 
@@ -186,63 +204,98 @@ if page == "📈 Market Overview":
             else 0
         )
 
+        # ================= REPORT =================
+
         with st.container(border=True):
 
-            c1, c2, c3 = st.columns(3)
+            left, right = st.columns([2.4, 1.2])
 
-            with c1:
-                st.metric("Market Mood", market_mood)
-                st.metric("News", news_report.overall_sentiment)
+            # ---------- LEFT ----------
+            with left:
 
-            with c2:
-                st.metric("Strong BUY", best_buy)
-                st.metric("Strong SELL", best_sell)
+                st.markdown("### 🧠 AI Market Summary")
 
-            with c3:
-                st.metric("AI Confidence", f"{best_confidence}%")
-                st.metric("F&O Companies", len(oracle.indices.fno_symbols))
+                if market_mood.startswith("🟢"):
 
-            st.divider()
+                    st.success(
+                        f"""
+        ### Market Overview
 
-            st.markdown("### 🧠 AI Summary")
+        **Market Mood :** {market_mood}
 
-            if market_mood.startswith("🟢"):
-                st.success(
-                    f"""
-        Market sentiment is **Bullish**.
+        **Best BUY :** {best_buy}
 
-        • Strong BUY Candidate : **{best_buy}**
+        **BUY Signals :** {buy_count}
 
-        • Total BUY Signals : **{buy_count}**
+        **News :** {news_report.overall_sentiment}
 
-        • Positive News : **{news_report.overall_sentiment}**
+        **AI Confidence :** {best_confidence}%
 
-        AI currently favors bullish opportunities.
+        ---
+
+        The market is showing bullish momentum.
+
+        AI recommends focusing on high-confidence BUY opportunities.
+
+        Current strongest candidate is **{best_buy}**.
         """
-                )
+                    )
 
-            elif market_mood.startswith("🔴"):
-                st.error(
-                    f"""
-        Market sentiment is **Bearish**.
+                elif market_mood.startswith("🔴"):
 
-        • Strong SELL Candidate : **{best_sell}**
+                    st.error(
+                        f"""
+        ### Market Overview
 
-        • Total SELL Signals : **{sell_count}**
+        **Market Mood :** {market_mood}
+
+        **Best SELL :** {best_sell}
+
+        **SELL Signals :** {sell_count}
+
+        **News :** {news_report.overall_sentiment}
+
+        ---
+
+        Market remains under selling pressure.
 
         AI recommends defensive positioning.
+
+        Current strongest SELL candidate is **{best_sell}**.
         """
-                )
+                    )
 
-            else:
-                st.warning(
-                    """
-        Market is currently moving sideways.
+                else:
 
-        No strong directional advantage.
+                    st.warning(
+                        """
+        ### Market Overview
 
-        Wait for confirmation before entering trades.
+        Market is moving sideways.
+
+        No strong trend detected.
+
+        Wait for confirmation before taking positions.
         """
+                    )
+
+            # ---------- RIGHT ----------
+            with right:
+
+                st.metric("Market Mood", market_mood)
+                st.metric("AI Confidence", f"{best_confidence}%")
+
+                st.metric("BUY Signals", buy_count)
+                st.metric("SELL Signals", sell_count)
+
+                st.metric("Best BUY", best_buy)
+                st.metric("Best SELL", best_sell)
+
+                st.metric("News", news_report.overall_sentiment)
+
+                st.metric(
+                    "F&O Companies",
+                    len(oracle.indices.fno_symbols)
                 )
 
         st.divider()
