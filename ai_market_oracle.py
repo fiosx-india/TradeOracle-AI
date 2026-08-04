@@ -478,3 +478,99 @@ class PluginRegistry:
     def __iter__(self):
         with self._lock:
             return iter(tuple(self._plugins.items()))
+
+class AIMarketOracle:
+    def __init__(
+        self,
+        oracle: TradeOracle | None = None,
+        *,
+        configuration: Mapping[str, Any] | None = None,
+        logger_instance: logging.Logger | None = None,
+        extensions: Iterable[AIMarketOracleExtension] | None = None,
+    ) -> None:
+        """
+        Initialize the master AI intelligence layer.
+
+        Args:
+            oracle:
+                Existing TradeOracle instance. When omitted, a new instance is
+                created using the project's public API.
+
+            configuration:
+                Optional runtime configuration. User-supplied values override the
+                built-in defaults.
+
+            logger_instance:
+                Optional logger. When omitted, the module logger is used.
+
+            extensions:
+                Optional collection of AI extensions implementing the
+                AIMarketOracleExtension protocol.
+        """
+        self._logger: logging.Logger = logger_instance or logger
+
+        self._logger.debug("Initializing AIMarketOracle.")
+
+        # ------------------------------------------------------------------
+        # Core TradeOracle integration
+        # ------------------------------------------------------------------
+        self._oracle: TradeOracle = oracle if oracle is not None else TradeOracle()
+
+        # Public engine references (obtained only through TradeOracle)
+        self._indices = self._oracle.indices
+        self._market = self._oracle.market
+        self._news = self._oracle.news
+        self._signal = self._oracle.signal
+
+        # ------------------------------------------------------------------
+        # Configuration
+        # ------------------------------------------------------------------
+        defaults: dict[str, Any] = {
+            "confidence_floor": 50.0,
+            "confidence_ceiling": 100.0,
+            "enable_news_weighting": True,
+            "enable_multi_timeframe": True,
+            "enable_risk_analysis": True,
+            "enable_explainability": True,
+            "default_timeframes": DEFAULT_TIMEFRAMES,
+            "signal_weights": dict(DEFAULT_SIGNAL_WEIGHTS),
+        }
+
+        self._config: dict[str, Any] = defaults
+
+        if configuration:
+            self._config.update(dict(configuration))
+
+        # ------------------------------------------------------------------
+        # Extension management
+        # ------------------------------------------------------------------
+        self._extensions: list[AIMarketOracleExtension] = (
+            list(extensions) if extensions is not None else []
+        )
+
+        # ------------------------------------------------------------------
+        # Internal state
+        # ------------------------------------------------------------------
+        self._initialized_at: datetime = datetime.utcnow()
+        self._analysis_count: int = 0
+        self._last_analysis_at: datetime | None = None
+
+        self._market_contexts: dict[str, MarketContext] = {}
+        self._latest_insights: dict[str, AIInsight] = {}
+
+        # ------------------------------------------------------------------
+        # Helper objects
+        # ------------------------------------------------------------------
+        self._confidence_strategy: ConfidenceStrategy | None = None
+        self._explanation_strategy: ExplanationStrategy | None = None
+
+        self._logger.info(
+            "AIMarketOracle initialized.",
+            extra={
+                "extensions": len(self._extensions),
+                "configuration_keys": tuple(sorted(self._config.keys())),
+            },
+        )
+        
+
+    
