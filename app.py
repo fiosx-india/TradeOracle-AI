@@ -139,107 +139,162 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
-        # ===================================================
+        # ==========================================================
         # 🤖 AI COMMAND CENTER
-        # ===================================================
+        # ==========================================================
 
+        st.markdown("---")
         st.subheader("🤖 AI Command Center")
 
-        col1, col2, col3 = st.columns([1.3, 1.3, 1])
+        # ==========================================================
+        # MARKET HEALTH
+        # ==========================================================
 
-        # ===================================================
-        # MARKET OVERVIEW
-        # ===================================================
+        m1, m2, m3, m4, m5, m6 = st.columns(6)
 
-        with col1:
+        with m1:
+            st.metric("Market Mood", market_mood)
 
-            st.markdown("### 📊 Market Overview")
-
-            if market_mood.startswith("🟢"):
-                st.success(f"**Market Mood : {market_mood}**")
-            elif market_mood.startswith("🔴"):
-                st.error(f"**Market Mood : {market_mood}**")
-            else:
-                st.warning(f"**Market Mood : {market_mood}**")
-
+        with m2:
             st.metric("AI Confidence", f"{best_confidence:.0f}%")
-            st.metric("BUY Signals", buy_count)
-            st.metric("SELL Signals", sell_count)
+
+        with m3:
+            st.metric("BUY", buy_count)
+
+        with m4:
+            st.metric("SELL", sell_count)
+
+        with m5:
             st.metric("News", news_report.overall_sentiment)
 
-        # ===================================================
-        # TOP SIGNALS
-        # ===================================================
-
-        with col2:
-
-            st.markdown("### 🚀 Top BUY")
-
-            if not buy_df.empty:
-
-                for _, row in buy_df.head(5).iterrows():
-
-                    st.success(
-                        f"{row['Index']}  |  "
-                        f"{row['Confidence']}%  |  "
-                        f"{row['Probability']}%"
-                    )
-
-            st.markdown("---")
-
-            st.markdown("### 🔻 Top SELL")
-
-            if not sell_df.empty:
-
-                for _, row in sell_df.head(5).iterrows():
-
-                    st.error(
-                        f"{row['Index']}  |  "
-                        f"{row['Confidence']}%  |  "
-                        f"{row['Probability']}%"
-                    )
-
-        # ===================================================
-        # INDEX SIGNALS
-        # ===================================================
-
-        with col3:
-
-            st.markdown("### 📈 Index Signals")
-
-            for symbol, result in results.items():
-
-                signal = result["signal"].signal
-
-                icon = {
-                    "BUY": "🟢",
-                    "SELL": "🔴",
-                    "HOLD": "🟡"
-                }.get(signal, "⚪")
-
-                st.write(f"{icon} **{symbol}**")
-                st.caption(signal)
+        with m6:
+            st.metric("F&O", len(oracle.indices.fno_symbols))
 
         st.divider()
 
-        # ===================================================
-        # AI MARKET SUMMARY
-        # ===================================================
+        # ==========================================================
+        # MARKET OVERVIEW
+        # ==========================================================
 
-        st.markdown("### 🧠 AI Market Summary")
+        st.markdown("### 🧠 AI Market Overview")
 
         if market_mood.startswith("🟢"):
-
             st.success(summary_text)
 
         elif market_mood.startswith("🔴"):
-
             st.error(summary_text)
 
         else:
-
             st.warning(summary_text)
 
+        st.divider()
+
+        # ==========================================================
+        # LIVE INDEX SIGNALS
+        # ==========================================================
+
+        st.markdown("### 📈 Live Index Signals")
+
+        cols = st.columns(3)
+
+        for i, (symbol, result) in enumerate(results.items()):
+
+            signal = result["signal"]
+
+            icon = {
+                "BUY": "🟢",
+                "SELL": "🔴",
+                "HOLD": "🟡"
+            }.get(signal.signal, "⚪")
+
+            with cols[i % 3]:
+
+                with st.container(border=True):
+
+                    st.markdown(f"### {icon} {symbol}")
+
+                    st.write(f"Trend : **{result['market'].trend}**")
+
+                    st.write(f"Momentum : **{result['market'].momentum}**")
+
+                    st.write(f"Signal : **{signal.signal}**")
+
+                    st.write(f"Confidence : **{signal.confidence:.0f}%**")
+
+                    st.write(f"Probability : **{signal.probability:.0f}%**")
+
+                    st.write(f"Entry : **₹{signal.entry_price:,.2f}**")
+
+                    st.write(f"Target : **₹{signal.target1:,.2f}**")
+
+                    st.write(f"Stop Loss : **₹{signal.stoploss:,.2f}**")
+
+        st.divider()
+
+        # ==========================================================
+        # TOP AI PICKS
+        # ==========================================================
+
+        left, right = st.columns(2)
+
+        with left:
+
+            st.markdown("### 🟢 Strong BUY")
+
+            if not buy_df.empty:
+
+                st.dataframe(
+                    buy_df[
+                        [
+                            "Index",
+                            "Confidence",
+                            "Probability"
+                        ]
+                    ].head(5),
+                    hide_index=True,
+                    use_container_width=True,
+                )
+
+        with right:
+
+            st.markdown("### 🔴 Strong SELL")
+
+            if not sell_df.empty:
+
+                st.dataframe(
+                    sell_df[
+                        [
+                            "Index",
+                            "Confidence",
+                            "Probability"
+                        ]
+                    ].head(5),
+                    hide_index=True,
+                    use_container_width=True,
+                )
+
+        st.divider()
+
+        # ==========================================================
+        # AI STATUS
+        # ==========================================================
+
+        if best_confidence >= 80:
+
+            st.success("✅ AI Engine Status : Excellent")
+
+        elif best_confidence >= 60:
+
+            st.info("🟢 AI Engine Status : Good")
+
+        elif best_confidence >= 40:
+
+            st.warning("🟡 AI Engine Status : Moderate")
+
+        else:
+
+            st.error("🔴 AI Engine Status : Weak")
+            
     st.subheader("📊 Market Summary")
 
     for symbol, result in results.items():
