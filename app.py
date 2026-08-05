@@ -144,27 +144,29 @@ if page == "📈 Market Overview":
         # SAFE AI VALUES
         # ===================================================
 
-        selected = buy_df.iloc[0] if not buy_df.empty else (
-            sell_df.iloc[0] if not sell_df.empty else None
-        )
+        selected = None
+
+        if not buy_df.empty:
+            selected = buy_df.iloc[0]
+        elif not sell_df.empty:
+            selected = sell_df.iloc[0]
 
         if selected is not None:
 
-            trend = selected.get("Trend", "-")
-            momentum = selected.get("Momentum", "-")
-            signal = selected.get("Signal", "HOLD")
+            trend = str(selected.get("Trend", "-"))
+            momentum = str(selected.get("Momentum", "-"))
+            signal = str(selected.get("Signal", "HOLD")).upper()
 
-            confidence = float(selected.get("Confidence", 0))
-            probability = float(selected.get("Probability", 0))
+            confidence = float(selected.get("Confidence", 0.0) or 0.0)
+            probability = float(selected.get("Probability", 0.0) or 0.0)
 
-            entry_price = float(selected.get("Last Price", 0))
+            entry_price = float(selected.get("Last Price", 0.0) or 0.0)
+            stop_loss = float(selected.get("Stop Loss", 0.0) or 0.0)
+            target1 = float(selected.get("Target 1", 0.0) or 0.0)
 
-            stop_loss = float(selected.get("Stop Loss", 0))
-            target1 = float(selected.get("Target 1", 0))
+            risk_reward = float(selected.get("Risk Reward", 0.0) or 0.0)
 
-            risk_reward = float(selected.get("Risk Reward", 0))
-
-            reason = selected.get("Reason", "-")
+            reason = str(selected.get("Reason", "No Reason"))
 
         else:
 
@@ -183,20 +185,20 @@ if page == "📈 Market Overview":
 
             reason = "No Signal"
 
-            # ===================================================
-            # SIGNAL VALIDATION
-            # ===================================================
+        # ===================================================
+        # SIGNAL VALIDATION
+        # ===================================================
 
+        if confidence >= 60 and probability >= 60:
             final_signal = signal
+        else:
+            final_signal = "HOLD"
 
-            if confidence < 60 or probability < 60:
-                final_signal = "HOLD"
-
-            signal_icon = {
-                "BUY": "🟢",
-                "SELL": "🔴",
-                "HOLD": "🟡",
-            }.get(final_signal, "⚪")
+        signal_icon = {
+            "BUY": "🟢",
+            "SELL": "🔴",
+            "HOLD": "🟡",
+        }.get(final_signal, "⚪")
 
 
     st.subheader("📊 Market Summary")
