@@ -139,67 +139,106 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
+        # ===================================================
+        # 🤖 AI COMMAND CENTER
+        # ===================================================
+
+        st.subheader("🤖 AI Command Center")
+
+        col1, col2, col3 = st.columns([1.3, 1.3, 1])
 
         # ===================================================
-        # SAFE AI VALUES
+        # MARKET OVERVIEW
         # ===================================================
 
-        selected = None
+        with col1:
 
-        if not buy_df.empty:
-            selected = buy_df.iloc[0]
-        elif not sell_df.empty:
-            selected = sell_df.iloc[0]
+            st.markdown("### 📊 Market Overview")
 
-        if selected is not None:
+            if market_mood.startswith("🟢"):
+                st.success(f"**Market Mood : {market_mood}**")
+            elif market_mood.startswith("🔴"):
+                st.error(f"**Market Mood : {market_mood}**")
+            else:
+                st.warning(f"**Market Mood : {market_mood}**")
 
-            trend = str(selected.get("Trend", "-"))
-            momentum = str(selected.get("Momentum", "-"))
-            signal = str(selected.get("Signal", "HOLD")).upper()
+            st.metric("AI Confidence", f"{best_confidence:.0f}%")
+            st.metric("BUY Signals", buy_count)
+            st.metric("SELL Signals", sell_count)
+            st.metric("News", news_report.overall_sentiment)
 
-            confidence = float(selected.get("Confidence", 0.0) or 0.0)
-            probability = float(selected.get("Probability", 0.0) or 0.0)
+        # ===================================================
+        # TOP SIGNALS
+        # ===================================================
 
-            entry_price = float(selected.get("Last Price", 0.0) or 0.0)
-            stop_loss = float(selected.get("Stop Loss", 0.0) or 0.0)
-            target1 = float(selected.get("Target 1", 0.0) or 0.0)
+        with col2:
 
-            risk_reward = float(selected.get("Risk Reward", 0.0) or 0.0)
+            st.markdown("### 🚀 Top BUY")
 
-            reason = str(selected.get("Reason", "No Reason"))
+            if not buy_df.empty:
+
+                for _, row in buy_df.head(5).iterrows():
+
+                    st.success(
+                        f"{row['Index']}  |  "
+                        f"{row['Confidence']}%  |  "
+                        f"{row['Probability']}%"
+                    )
+
+            st.markdown("---")
+
+            st.markdown("### 🔻 Top SELL")
+
+            if not sell_df.empty:
+
+                for _, row in sell_df.head(5).iterrows():
+
+                    st.error(
+                        f"{row['Index']}  |  "
+                        f"{row['Confidence']}%  |  "
+                        f"{row['Probability']}%"
+                    )
+
+        # ===================================================
+        # INDEX SIGNALS
+        # ===================================================
+
+        with col3:
+
+            st.markdown("### 📈 Index Signals")
+
+            for symbol, result in results.items():
+
+                signal = result["signal"].signal
+
+                icon = {
+                    "BUY": "🟢",
+                    "SELL": "🔴",
+                    "HOLD": "🟡"
+                }.get(signal, "⚪")
+
+                st.write(f"{icon} **{symbol}**")
+                st.caption(signal)
+
+        st.divider()
+
+        # ===================================================
+        # AI MARKET SUMMARY
+        # ===================================================
+
+        st.markdown("### 🧠 AI Market Summary")
+
+        if market_mood.startswith("🟢"):
+
+            st.success(summary_text)
+
+        elif market_mood.startswith("🔴"):
+
+            st.error(summary_text)
 
         else:
 
-            trend = "-"
-            momentum = "-"
-            signal = "HOLD"
-
-            confidence = 0.0
-            probability = 0.0
-
-            entry_price = 0.0
-            stop_loss = 0.0
-            target1 = 0.0
-
-            risk_reward = 0.0
-
-            reason = "No Signal"
-
-        # ===================================================
-        # SIGNAL VALIDATION
-        # ===================================================
-
-        if confidence >= 60 and probability >= 60:
-            final_signal = signal
-        else:
-            final_signal = "HOLD"
-
-        signal_icon = {
-            "BUY": "🟢",
-            "SELL": "🔴",
-            "HOLD": "🟡",
-        }.get(final_signal, "⚪")
-
+            st.warning(summary_text)
 
     st.subheader("📊 Market Summary")
 
