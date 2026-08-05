@@ -193,7 +193,7 @@ if page == "📈 Market Overview":
             st.metric("SELL", sell_count)
 
         with m5:
-            st.metric("News", news_report.overall_sentiment)
+            st.metric("News", "N/A")
 
         with m6:
             st.metric("F&O", len(oracle.indices.fno_symbols))
