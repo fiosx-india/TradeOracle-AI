@@ -178,3 +178,162 @@ SUPPORTED_MOVEMENT_FIELDS: Final[tuple[str, ...]] = (
 )
 
 LOGGER_NAME: Final[str] = "TradeOracle.MovementPredictionAI"
+
+from typing import Protocol
+
+
+class MarketAnalysisProtocol(Protocol):
+    """Minimum public MarketAnalysis interface required by MovementPredictionAI."""
+
+    trend: str
+    momentum: str
+
+    strength: float
+    market_score: float
+    bullish_score: float
+    bearish_score: float
+
+    last_price: float
+    support: float
+    resistance: float
+
+    ema20: float
+    ema50: float
+
+    rsi: float
+
+    macd: float
+    signal_line: float
+
+    vwap: float
+    atr: float
+    adx: float
+
+    volume_status: str
+
+    breakout: bool
+    breakdown: bool
+
+    prediction_5m: str
+    prediction_15m: str
+    prediction_30m: str
+    prediction_1h: str
+
+
+class NewsAnalysisProtocol(Protocol):
+    """Minimum public NewsAnalysis interface required by MovementPredictionAI."""
+
+    overall_sentiment: str
+
+    total_score: float
+
+    news_count: int
+
+    bullish_score: float
+    bearish_score: float
+
+    positive_count: int
+    negative_count: int
+
+    recommendation: str
+
+    high_impact: bool
+
+
+class SignalResultProtocol(Protocol):
+    """Minimum public SignalResult interface required by MovementPredictionAI."""
+
+    signal: str
+
+    confidence: float
+    probability: float
+
+    expected_time: str
+
+    reason: str
+
+    market_score: float
+    news_score: float
+
+    risk_level: str
+
+    entry_price: float
+
+    target: float
+    target1: float
+    target2: float
+    target3: float
+
+    stoploss: float
+
+    risk_reward: float
+
+from dataclasses import dataclass
+from typing import Tuple
+
+
+@dataclass(frozen=True, slots=True)
+class MovementEvidence:
+    """
+    Immutable evidence supporting the overall movement assessment.
+    """
+
+    trend_alignment: float
+    momentum_alignment: float
+    market_structure_score: float
+    technical_confirmation_score: float
+    news_alignment_score: float
+    signal_alignment_score: float
+    supporting_factors: Tuple[str, ...]
+    warning_factors: Tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class TimingEvidence:
+    """
+    Immutable evidence supporting entry and exit timing assessments.
+    """
+
+    entry_score: float
+    exit_score: float
+    entry_distance: float
+    stoploss_distance: float
+    target_distance: float
+    risk_reward_ratio: float
+    expected_time: str
+    observations: Tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PressureEvidence:
+    """
+    Immutable evidence describing buying and selling pressure.
+    """
+
+    buying_pressure: float
+    selling_pressure: float
+    trend_strength: float
+    momentum_strength: float
+    volume_strength: float
+    market_energy: float
+    acceleration_score: float
+    deceleration_score: float
+    observations: Tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class TargetEvidence:
+    """
+    Immutable evidence supporting target reach assessments.
+    """
+
+    target1_confidence: float
+    target2_confidence: float
+    target3_confidence: float
+    breakout_probability: float
+    breakdown_probability: float
+    continuation_probability: float
+    reversal_probability: float
+    false_signal_probability: float
+    observations: Tuple[str, ...]
+
