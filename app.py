@@ -140,6 +140,34 @@ if page == "📈 Market Overview":
         )
 
         # ==========================================================
+        # AI SUMMARY VALUES
+        # ==========================================================
+
+        buy_count = len(buy_df)
+        sell_count = len(sell_df)
+
+        best_confidence = 0
+
+        if not buy_df.empty:
+            best_confidence = max(best_confidence, float(buy_df["Confidence"].max()))
+
+        if not sell_df.empty:
+            best_confidence = max(best_confidence, float(sell_df["Confidence"].max()))
+
+        if buy_count > sell_count:
+            market_mood = "🟢 Bullish"
+        elif sell_count > buy_count:
+            market_mood = "🔴 Bearish"
+        else:
+            market_mood = "🟡 Neutral"
+
+        summary_text = (
+            f"BUY Signals : {buy_count} | "
+            f"SELL Signals : {sell_count} | "
+            f"Best Confidence : {best_confidence:.0f}%"
+        )
+
+        # ==========================================================
         # 🤖 AI COMMAND CENTER
         # ==========================================================
 
