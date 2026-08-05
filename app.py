@@ -139,6 +139,168 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
+
+        # ===================================================
+        # AI MARKET REPORT
+        # ===================================================
+
+        st.subheader("🤖 AI Market Report")
+
+        # ---------------------------------------------------
+        # SIGNAL VALIDATION
+        # ---------------------------------------------------
+
+        final_signal = signal
+
+        if confidence < 60 or probability < 60:
+            final_signal = "HOLD"
+
+        signal_icon = {
+            "BUY": "🟢",
+            "SELL": "🔴",
+            "HOLD": "🟡"
+        }.get(final_signal, "⚪")
+
+        with st.container(border=True):
+
+            # ==================================================
+            # AI SUMMARY
+            # ==================================================
+
+            st.markdown("## 🧠 AI Market Summary")
+
+            if market_mood.startswith("🟢"):
+                st.success(summary_text)
+
+            elif market_mood.startswith("🔴"):
+                st.error(summary_text)
+
+            else:
+                st.warning(summary_text)
+
+            st.divider()
+
+            # ==================================================
+            # MARKET SNAPSHOT
+            # ==================================================
+
+            st.markdown("### 📊 Market Snapshot")
+
+            c1, c2, c3, c4 = st.columns(4)
+
+            with c1:
+                st.metric("Market Mood", market_mood)
+                st.metric("BUY Signals", buy_count)
+
+            with c2:
+                st.metric("AI Confidence", f"{best_confidence:.1f}%")
+                st.metric("SELL Signals", sell_count)
+
+            with c3:
+                st.metric("Best BUY", best_buy)
+                st.metric("Best SELL", best_sell)
+
+            with c4:
+                st.metric("News", news_report.overall_sentiment)
+                st.metric("F&O Symbols", len(oracle.indices.fno_symbols))
+
+            st.divider()
+
+            # ==================================================
+            # AI DECISION
+            # ==================================================
+
+            st.markdown("### 🔍 AI Decision")
+
+            left, right = st.columns(2)
+
+            with left:
+
+                st.write(f"**Trend :** {trend}")
+                st.write(f"**Momentum :** {momentum}")
+                st.write(f"**AI Signal :** {signal_icon} {final_signal}")
+                st.write(f"**Confidence :** {confidence:.1f}%")
+                st.write(f"**Probability :** {probability:.1f}%")
+
+            with right:
+
+                st.write(f"**Entry :** ₹{entry_price:,.2f}")
+                st.write(f"**Stop Loss :** ₹{stop_loss:,.2f}")
+                st.write(f"**Target 1 :** ₹{target1:,.2f}")
+                st.write(f"**Risk / Reward :** {risk_reward:.2f}")
+                st.write(f"**Reason :** {reason}")
+
+            st.divider()
+
+            # ==================================================
+            # AI HEALTH CHECK
+            # ==================================================
+
+            st.markdown("### 🩺 AI Health Check")
+
+            if final_signal == "HOLD":
+
+                st.warning(f"""
+        ### ⚠ Weak Signal
+
+        AI has reduced this signal to **HOLD**.
+
+        • Confidence : **{confidence:.1f}%**
+        • Probability : **{probability:.1f}%**
+
+        Recommendation:
+
+        • Wait for trend confirmation.
+
+        • Avoid aggressive BUY / SELL entries.
+
+        • Monitor price action before entering.
+        """)
+
+            else:
+
+                st.success(f"""
+        ### ✅ Strong Signal
+
+        AI recommends **{final_signal}**
+
+        • Confidence : **{confidence:.1f}%**
+
+        • Probability : **{probability:.1f}%**
+
+        Current signal has acceptable confirmation.
+        """)
+
+            st.divider()
+
+            # ==================================================
+            # RESERVED EXPANSION AREA
+            # ==================================================
+
+            st.markdown("### 🚀 Future AI Modules")
+
+            row1 = st.columns(3)
+
+            with row1[0]:
+                st.info("📊 Sector Analysis\n\nReserved")
+
+            with row1[1]:
+                st.info("🔥 AI Watchlist\n\nReserved")
+
+            with row1[2]:
+                st.info("📈 Strategy Recommendation\n\nReserved")
+
+            row2 = st.columns(3)
+
+            with row2[0]:
+                st.info("🚨 Live Alerts\n\nReserved")
+
+            with row2[1]:
+                st.info("🗺 Market Heat Map\n\nReserved")
+
+            with row2[2]:
+                st.info("📉 Market Breadth\n\nReserved")
+
     st.subheader("📊 Market Summary")
 
     for symbol, result in results.items():
