@@ -94,3 +94,87 @@ class MarketEnergy(Enum):
     MODERATE = "MODERATE"
     HIGH = "HIGH"
     VERY_HIGH = "VERY_HIGH"
+
+from typing import Final, Mapping
+
+DEFAULT_MOVEMENT_CONFIGURATION: Final[Mapping[str, float | int | bool]] = {
+    # Normalized score limits
+    "minimum_score": 0.0,
+    "maximum_score": 100.0,
+
+    # Classification thresholds
+    "high_confidence_threshold": 80.0,
+    "medium_confidence_threshold": 60.0,
+    "low_confidence_threshold": 40.0,
+
+    # Trend assessment
+    "trend_continuation_weight": 0.25,
+    "trend_reversal_weight": 0.20,
+    "momentum_weight": 0.15,
+    "market_structure_weight": 0.15,
+    "volume_weight": 0.10,
+    "volatility_weight": 0.10,
+    "news_weight": 0.05,
+
+    # Breakout / Breakdown
+    "breakout_confirmation_threshold": 70.0,
+    "breakdown_confirmation_threshold": 70.0,
+
+    # Signal quality
+    "false_signal_warning_threshold": 65.0,
+    "signal_stability_threshold": 75.0,
+
+    # Target reach assessment
+    "target1_weight": 1.00,
+    "target2_weight": 0.80,
+    "target3_weight": 0.60,
+
+    # Timing assessment
+    "entry_quality_threshold": 75.0,
+    "exit_quality_threshold": 75.0,
+
+    # Market energy
+    "market_energy_threshold": 60.0,
+
+    # Deterministic behaviour
+    "rounding_precision": 2,
+    "clamp_scores": True,
+}
+
+MOVEMENT_SCORE_RANGE: Final[tuple[float, float]] = (0.0, 100.0)
+
+MOVEMENT_TIMEFRAMES: Final[tuple[str, ...]] = (
+    "5m",
+    "15m",
+    "30m",
+    "1h",
+)
+
+SUPPORTED_MOVEMENT_FIELDS: Final[tuple[str, ...]] = (
+    "trend",
+    "momentum",
+    "rsi",
+    "macd",
+    "ema",
+    "vwap",
+    "adx",
+    "atr",
+    "support",
+    "resistance",
+    "breakout",
+    "breakdown",
+    "market_score",
+    "confidence",
+    "probability",
+    "risk_level",
+    "entry_price",
+    "target1",
+    "target2",
+    "target3",
+    "stoploss",
+    "risk_reward",
+    "expected_time",
+    "overall_sentiment",
+)
+
+LOGGER_NAME: Final[str] = "TradeOracle.MovementPredictionAI"
