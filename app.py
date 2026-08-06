@@ -266,6 +266,58 @@ if page == "📈 Market Overview":
                         st.write(f"Buying Pressure : **{movement.buying_pressure:.0f}%**")
                         st.write(f"Selling Pressure : **{movement.selling_pressure:.0f}%**")
                         st.write(f"Trend Continuation : **{movement.trend_continuation_chance:.0f}%**")
+
+
+                        st.write(
+                            f"Breakout Chance : "
+                            f"**{movement.breakout_chance:.0f}%**"
+                        )
+
+                        st.write(
+                            f"Breakdown Chance : "
+                            f"**{movement.breakdown_chance:.0f}%**"
+                        )
+
+                        st.write(
+                            f"Target 1 Reach : "
+                            f"**{movement.target1_reach_confidence:.0f}%**"
+                        )
+
+                        st.write(
+                            f"Target 2 Reach : "
+                            f"**{movement.target2_reach_confidence:.0f}%**"
+                        )
+
+                        st.write(
+                            f"Target 3 Reach : "
+                            f"**{movement.target3_reach_confidence:.0f}%**"
+                        )
+
+                        st.write(
+                            f"False Signal Risk : "
+                            f"**{movement.false_signal_risk:.0f}%**"
+                        )
+
+                        st.write(
+                            f"Best Entry : "
+                            f"**{movement.entry_timing}**"
+                        )
+
+                        st.write(
+                            f"Best Exit : "
+                            f"**{movement.exit_timing}**"
+                        )
+
+                        st.write(
+                            f"Market Energy : "
+                            f"**{movement.market_energy:.0f}%**"
+                        )
+
+                        st.write(
+                            f"Volatility : "
+                            f"**{movement.volatility_state}**"
+                        )
+                        
                         st.info(movement.ai_observation)
 
 
