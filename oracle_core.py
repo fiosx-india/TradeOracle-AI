@@ -65,7 +65,6 @@ class TradeOracle:
                 "market": market_reports[symbol],
                 "news": news_report,
                 "signal": signal,
-                "movement": movement
             }
 
         return results
