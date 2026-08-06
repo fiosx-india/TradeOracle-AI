@@ -256,77 +256,20 @@ if page == "📈 Market Overview":
                     st.write(f"Target : **₹{signal.target1:,.2f}**")
 
                     st.write(f"Stop Loss : **₹{signal.stoploss:,.2f}**")
+                    
+                    movement = result.get("movement")
+
+                    if movement:
+                        st.divider()
+                        st.write(f"AI Status : **{movement.ai_movement_status}**")
+                        st.write(f"Movement Strength : **{movement.movement_strength:.0f}%**")
+                        st.write(f"Buying Pressure : **{movement.buying_pressure:.0f}%**")
+                        st.write(f"Selling Pressure : **{movement.selling_pressure:.0f}%**")
+                        st.write(f"Trend Continuation : **{movement.trend_continuation_chance:.0f}%**")
+                        st.info(movement.ai_observation)
+
 
         st.divider()
-
-
-        # ==========================================================
-        # AI MOVEMENT PREDICTION
-        # ==========================================================
-
-        movement = result.get("movement")
-
-        if movement:
-
-            st.divider()
-
-            st.markdown("#### 🧠 AI Movement Prediction")
-
-            st.write(f"Status : **{movement.ai_movement_status}**")
-
-            st.write(f"Move Strength : **{movement.movement_strength:.0f}%**")
-
-            st.write(
-                f"Trend Continuation : "
-                f"**{movement.trend_continuation_chance:.0f}%**"
-            )
-
-            st.write(
-                f"Trend Reversal : "
-                f"**{movement.trend_reversal_chance:.0f}%**"
-            )
-
-            st.write(
-                f"Buying Pressure : "
-                f"**{movement.buying_pressure:.0f}%**"
-            )
-
-            st.write(
-                f"Selling Pressure : "
-                f"**{movement.selling_pressure:.0f}%**"
-            )
-
-            st.write(
-                f"Breakout Chance : "
-                f"**{movement.breakout_chance:.0f}%**"
-            )
-
-            st.write(
-                f"Breakdown Chance : "
-                f"**{movement.breakdown_chance:.0f}%**"
-            )
-
-            st.write(
-                f"Best Entry : "
-                f"**{movement.entry_timing}**"
-            )
-
-            st.write(
-                f"Best Exit : "
-                f"**{movement.exit_timing}**"
-            )
-
-            st.write(
-                f"Target1 Reach : "
-                f"**{movement.target1_reach_confidence:.0f}%**"
-            )
-
-            st.write(
-                f"Signal Stability : "
-                f"**{movement.signal_stability:.0f}%**"
-            )
-
-            st.info(movement.ai_observation)
             
         # ==========================================================
         # TOP AI PICKS
