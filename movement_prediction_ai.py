@@ -924,6 +924,7 @@ class MovementPredictionAI:
         continuation = target_confidence.continuation_probability
         reversal = target_confidence.reversal_probability
 
+        # Overall Status
         if continuation >= 80:
             status = MovementStatus.STRENGTHENING.value
         elif continuation >= 60:
@@ -933,6 +934,7 @@ class MovementPredictionAI:
         else:
             status = MovementStatus.WEAKENING.value
 
+        # Entry Timing
         if continuation >= 75:
             entry = TimingQuality.EXCELLENT.value
         elif continuation >= 60:
@@ -942,24 +944,42 @@ class MovementPredictionAI:
         else:
             entry = TimingQuality.AVOID.value
 
+        # Exit Timing
         if reversal >= 75:
             exit_time = TimingQuality.EXCELLENT.value
         elif reversal >= 60:
             exit_time = TimingQuality.GOOD.value
-        else:
+        elif reversal >= 40:
             exit_time = TimingQuality.FAIR.value
+        else:
+            exit_time = TimingQuality.POOR.value
 
-        volatility = (
-            VolatilityState.HIGH.value
-            if market.atr > 0
-            else VolatilityState.NORMAL.value
+        # Volatility
+        if market.atr >= 100:
+            volatility = VolatilityState.EXTREME.value
+        elif market.atr >= 50:
+            volatility = VolatilityState.HIGH.value
+        elif market.atr >= 20:
+            volatility = VolatilityState.NORMAL.value
+        else:
+            volatility = VolatilityState.LOW.value
+
+        # Acceleration / Deceleration
+        pressure_gap = abs(
+            pressure.buying_pressure - pressure.selling_pressure
         )
 
-        acceleration = (
-            AccelerationStatus.ACCELERATING.value
-            if pressure.buying_pressure >= pressure.selling_pressure
-            else AccelerationStatus.DECELERATING.value
-        )
+        if pressure_gap <= 5:
+            acceleration = AccelerationStatus.STABLE.value
+            deceleration = AccelerationStatus.STABLE.value
+
+        elif pressure.buying_pressure > pressure.selling_pressure:
+            acceleration = AccelerationStatus.ACCELERATING.value
+            deceleration = AccelerationStatus.DECELERATING.value
+
+        else:
+            acceleration = AccelerationStatus.DECELERATING.value
+            deceleration = AccelerationStatus.ACCELERATING.value
 
         observation = (
             f"{signal.signal} signal with "
@@ -968,7 +988,7 @@ class MovementPredictionAI:
 
         explanation = (
             "Assessment combines trend, momentum, breakout, "
-            "technical structure and signal confidence."
+            "technical structure, pressure analysis, and signal confidence."
         )
 
         return MovementAssessment(
@@ -993,11 +1013,7 @@ class MovementPredictionAI:
             exit_timing=exit_time,
 
             acceleration_status=acceleration,
-            deceleration_status=(
-                AccelerationStatus.DECELERATING.value
-                if acceleration == AccelerationStatus.ACCELERATING.value
-                else AccelerationStatus.ACCELERATING.value
-            ),
+            deceleration_status=deceleration,
 
             market_energy=pressure.market_energy,
             volatility_state=volatility,
