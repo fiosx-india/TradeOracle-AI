@@ -126,8 +126,29 @@ class SignalEngine:
         if bullish >= bearish + 20:
             
             result.signal = "BUY"
-            result.confidence = min(95, bullish)
-            result.probability = min(95, max(50, (bullish + abs(market.market_score)) / 2))
+            score = bullish - bearish
+
+            result.confidence = round(
+                min(
+                    95,
+                    max(
+                        40,
+                        market.confidence + (score * 0.5)
+                    )
+                ),
+                2,
+            )
+
+            result.probability = round(
+                min(
+                    95,
+                    max(
+                        45,
+                        result.confidence + (market.strength * 0.3)
+                    )
+                ),
+                2,
+            )
             result.expected_time = "30m"
             result.reason = ", ".join(reasons)
             result.risk_level = "LOW"
@@ -135,8 +156,29 @@ class SignalEngine:
         elif bearish >= bullish + 15:
             
             result.signal = "SELL"
-            result.confidence = min(95, bearish)
-            result.probability = min(95, max(50, (bearish + abs(market.market_score)) / 2))
+            score = bearish - bullish
+
+            result.confidence = round(
+                min(
+                    95,
+                    max(
+                        40,
+                        market.confidence + (score * 0.5)
+                    )
+                ),
+                2,
+            )
+
+            result.probability = round(
+                min(
+                    95,
+                    max(
+                        45,
+                        result.confidence + (market.strength * 0.3)
+                    )
+                ),
+                2,
+            )
             result.expected_time = "30m"
             result.reason = ", ".join(reasons)
             result.risk_level = "LOW"
