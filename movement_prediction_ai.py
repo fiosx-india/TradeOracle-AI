@@ -428,7 +428,6 @@ class MovementPredictionAI:
                 signal=signal,
                 trend_strength=trend_strength,
                 pressure=pressure,
-                breakout_probability=breakout_probability,
                 target_confidence=target_confidence,
             )
 
