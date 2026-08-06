@@ -199,6 +199,14 @@ class IndicesEngine:
                             "volume": 0,
                         },
                     )
+                    
+                    item = self.indices[symbol]
+
+                    if len(item.close_prices) == 1:
+                        item.close_prices *= 100
+                        item.high_prices *= 100
+                        item.low_prices *= 100
+                        item.volumes *= 100
 
             print(f"Loaded Indices CSV: {self.indices_csv.name}")
 
@@ -253,6 +261,14 @@ class IndicesEngine:
                             "previous_close": previous_close,
                         },
                     )
+
+                    item = self.indices[index_id]
+
+                    if len(item.close_prices) == 1:
+                        item.close_prices *= 100
+                        item.high_prices *= 100
+                        item.low_prices *= 100
+                        item.volumes *= 100
 
             print(f"Loaded Summary CSV: {self.summary_csv.name}")
 
