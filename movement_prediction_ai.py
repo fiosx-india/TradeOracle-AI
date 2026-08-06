@@ -801,57 +801,100 @@ class MovementPredictionAI:
     ) -> TargetEvidence:
         """
         Refine target reach confidence using trend strength,
-        buying/selling pressure and breakout assessment.
+        buying/selling pressure, breakout probability and
+        overall market quality.
         """
 
         continuation = target_evidence.continuation_probability
 
         adjustment = (
-            trend_strength * 0.20
-            + pressure.buying_pressure * 0.20
-            - pressure.selling_pressure * 0.10
+            (trend_strength * 0.20)
+            + (pressure.buying_pressure * 0.15)
+            - (pressure.selling_pressure * 0.10)
+            + (market.strength * 0.15)
+            + (signal.confidence * 0.10)
+            + (signal.probability * 0.10)
         )
 
+        continuation += adjustment
+
+        minimum = float(self._config["minimum_score"])
+        maximum = float(self._config["maximum_score"])
+        precision = int(self._config["rounding_precision"])
+
         continuation = max(
-            self._config["minimum_score"],
+            minimum,
             min(
-                self._config["maximum_score"],
-                continuation + adjustment,
+                maximum,
+                continuation,
             ),
         )
+
+        if signal.signal.upper() == "BUY":
+            continuation = max(
+                continuation,
+                target_evidence.breakout_probability,
+            )
+
+        elif signal.signal.upper() == "SELL":
+            continuation = max(
+                continuation,
+                target_evidence.breakdown_probability,
+            )
 
         target1 = continuation
 
         target2 = max(
-            0.0,
+            minimum,
             continuation * 0.85,
         )
 
         target3 = max(
-            0.0,
+            minimum,
             continuation * 0.70,
         )
 
-        false_signal = max(
-            0.0,
-            100.0 - continuation,
+        reversal = max(
+            minimum,
+            min(
+                maximum,
+                100.0 - continuation,
+            ),
         )
 
-        precision = self._config["rounding_precision"]
+        false_signal = max(
+            minimum,
+            min(
+                maximum,
+                reversal * 0.80,
+            ),
+        )
 
         return TargetEvidence(
             target1_confidence=round(target1, precision),
             target2_confidence=round(target2, precision),
             target3_confidence=round(target3, precision),
 
-            breakout_probability=target_evidence.breakout_probability,
-            breakdown_probability=target_evidence.breakdown_probability,
+            breakout_probability=round(
+                target_evidence.breakout_probability,
+                precision,
+            ),
+
+            breakdown_probability=round(
+                target_evidence.breakdown_probability,
+                precision,
+            ),
 
             continuation_probability=round(
                 continuation,
                 precision,
             ),
-            reversal_probability=target_evidence.reversal_probability,
+
+            reversal_probability=round(
+                reversal,
+                precision,
+            ),
+
             false_signal_probability=round(
                 false_signal,
                 precision,
@@ -859,6 +902,8 @@ class MovementPredictionAI:
 
             observations=(
                 *target_evidence.observations,
+                "Trend strength applied.",
+                "Signal confidence applied.",
                 "Target confidence refined.",
             ),
         )
