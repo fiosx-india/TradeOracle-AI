@@ -59,38 +59,71 @@ class SignalEngine:
 
         else:
             reasons.append("Neutral News")
+            
         # ---------- Technical Indicator Confirmation ----------
 
-        if market.rsi >= 60:
+        # RSI
+        if market.rsi >= 70:
+            bullish += 15
+            reasons.append("Strong RSI Bullish")
+
+        elif market.rsi >= 60:
             bullish += 10
             reasons.append("RSI Bullish")
+
+        elif market.rsi <= 30:
+            bearish += 15
+            reasons.append("Strong RSI Bearish")
 
         elif market.rsi <= 40:
             bearish += 10
             reasons.append("RSI Bearish")
 
+
+        # EMA
+        ema_gap = abs(market.ema20 - market.ema50)
+
         if market.ema20 > market.ema50:
-            bullish += 10
+            bullish += min(15, max(5, ema_gap))
             reasons.append("EMA Bullish Cross")
 
         elif market.ema20 < market.ema50:
-            bearish += 10
+            bearish += min(15, max(5, ema_gap))
             reasons.append("EMA Bearish Cross")
 
+
+        # MACD
+        macd_gap = abs(market.macd - market.signal_line)
+
         if market.macd > market.signal_line:
-            bullish += 10
+            bullish += min(15, max(5, macd_gap * 10))
             reasons.append("MACD Bullish")
 
         elif market.macd < market.signal_line:
-            bearish += 10
+            bearish += min(15, max(5, macd_gap * 10))
             reasons.append("MACD Bearish")
 
-        if market.adx >= 25:
-            bullish += 5
-            bearish += 5
-            reasons.append("Strong Trend (ADX)")
 
-        if bullish >= bearish + 15:
+        # ADX
+        if market.adx >= 40:
+            if bullish > bearish:
+                bullish += 10
+            elif bearish > bullish:
+                bearish += 10
+
+            reasons.append("Very Strong Trend")
+
+        elif market.adx >= 25:
+            if bullish > bearish:
+                bullish += 5
+            elif bearish > bullish:
+                bearish += 5
+
+            reasons.append("Strong Trend")
+
+
+        # Decision Threshold
+        if bullish >= bearish + 20:
             
             result.signal = "BUY"
             result.confidence = min(95, bullish)
