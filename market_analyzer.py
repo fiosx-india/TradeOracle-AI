@@ -76,22 +76,45 @@ class MarketAnalyzer:
         
         # ---------- Indicator Score ----------
 
-        if result.rsi >= 60:
+        # RSI
+        if result.rsi >= 70:
+            result.bullish_score += 15
+
+        elif result.rsi >= 60:
             result.bullish_score += 10
+
+        elif result.rsi <= 30:
+            result.bearish_score += 15
+
         elif result.rsi <= 40:
             result.bearish_score += 10
 
+        # EMA
+        ema_gap = abs(result.ema20 - result.ema50)
+
         if result.ema20 > result.ema50:
-            result.bullish_score += 10
+            result.bullish_score += min(15, max(5, ema_gap))
+
         elif result.ema20 < result.ema50:
-            result.bearish_score += 10
+            result.bearish_score += min(15, max(5, ema_gap))
+
+        # MACD
+        macd_gap = abs(result.macd - result.signal_line)
 
         if result.macd > result.signal_line:
-            result.bullish_score += 10
-        elif result.macd < result.signal_line:
-            result.bearish_score += 10
+            result.bullish_score += min(15, max(5, macd_gap * 10))
 
-        if result.adx >= 25:
+        elif result.macd < result.signal_line:
+            result.bearish_score += min(15, max(5, macd_gap * 10))
+
+        # ADX
+        if result.adx >= 40:
+            result.strength += 30
+
+        elif result.adx >= 25:
+            result.strength += 20
+
+        elif result.adx >= 15:
             result.strength += 10
             
         # ---------- Trend ----------
@@ -158,7 +181,19 @@ class MarketAnalyzer:
             result.volume_status = "UNAVAILABLE"
 
         # ---------- Confidence ----------
-        result.confidence = min(max(result.bullish_score, result.bearish_score), 100)
+        
+        score_gap = abs(result.bullish_score - result.bearish_score)
+
+        result.confidence = round(
+            min(
+                95,
+                max(
+                    40,
+                    max(result.bullish_score, result.bearish_score) + (score_gap * 0.3)
+                )
+            ),
+            2,
+        )
 
         # ---------- Market Score ----------
         result.market_score = result.bullish_score - result.bearish_score
