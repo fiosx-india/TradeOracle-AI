@@ -337,3 +337,473 @@ class TargetEvidence:
     false_signal_probability: float
     observations: Tuple[str, ...]
 
+class MovementPredictionAI:
+    """
+    AI companion responsible for evaluating how an existing BUY/SELL/HOLD
+    signal is likely to evolve.
+
+    This class does not generate trading signals. Instead, it analyzes the
+    strength, continuation, reversal, breakout potential, buying pressure,
+    selling pressure, target confidence, and overall quality of an existing
+    signal before it reaches the dashboard.
+    """
+
+    def __init__(
+        self,
+        *,
+        configuration: Mapping[str, Any] | None = None,
+        logger_instance: logging.Logger | None = None,
+    ) -> None:
+        self._logger = (
+            logger_instance
+            if logger_instance is not None
+            else logging.getLogger(LOGGER_NAME)
+        )
+
+        self._config = dict(DEFAULT_MOVEMENT_CONFIGURATION)
+
+        if configuration:
+            self._config.update(configuration)
+
+        self._analysis_count = 0
+        self._last_error = None
+
+        self._assessment_cache: dict[str, MovementAssessment] = {}
+        self._evidence_cache: dict[str, MovementEvidence] = {}
+
+        self._logger.info(
+            "MovementPredictionAI initialized.",
+            extra={
+                "configuration_keys": tuple(sorted(self._config.keys()))
+            },
+        )
+
+def analyze(
+    self,
+    market: MarketAnalysisProtocol,
+    news: NewsAnalysisProtocol,
+    signal: SignalResultProtocol,
+) -> MovementAssessment:
+    """
+    Analyze an existing trading signal and produce a MovementAssessment.
+
+    This method orchestrates the internal analysis pipeline without
+    modifying the existing BUY/SELL/HOLD signal.
+    """
+
+    self._analysis_count += 1
+
+    try:
+        trend_strength = self._calculate_trend_strength(
+            market,
+            signal,
+        )
+
+        pressure = self._calculate_buying_selling_pressure(
+            market,
+            signal,
+        )
+
+        breakout_probability = self._calculate_breakout_probability(
+            market,
+            signal,
+            trend_strength,
+            pressure,
+        )
+
+        target_confidence = self._calculate_target_confidence(
+            market,
+            signal,
+            trend_strength,
+            pressure,
+            breakout_probability,
+        )
+
+        assessment = self._build_movement_assessment(
+            market=market,
+            news=news,
+            signal=signal,
+            trend_strength=trend_strength,
+            pressure=pressure,
+            breakout_probability=breakout_probability,
+            target_confidence=target_confidence,
+        )
+
+        return assessment
+
+    except Exception as exc:
+        self._last_error = exc
+        self._logger.exception(
+            "Movement prediction analysis failed."
+        )
+        raise
+
+def _calculate_trend_strength(
+    self,
+    market: MarketAnalysisProtocol,
+    signal: SignalResultProtocol,
+) -> float:
+    """
+    Calculate a normalized trend-strength score using the existing
+    market analysis and signal objects.
+    """
+
+    score = 0.0
+
+    if market.trend.upper() == "BULLISH":
+        score += 25.0
+    elif market.trend.upper() == "BEARISH":
+        score += 25.0
+
+    if market.momentum.upper() == "STRONG":
+        score += 20.0
+    elif market.momentum.upper() == "MODERATE":
+        score += 10.0
+
+    score += max(0.0, min(20.0, float(market.adx) / 2.5))
+
+    score += max(0.0, min(20.0, float(signal.confidence) * 0.20))
+
+    score += max(0.0, min(15.0, float(signal.probability) * 0.15))
+
+    minimum = float(self._config["minimum_score"])
+    maximum = float(self._config["maximum_score"])
+    precision = int(self._config["rounding_precision"])
+
+    score = max(minimum, min(maximum, score))
+
+    self._logger.debug(
+        "Trend strength calculated.",
+        extra={
+            "trend_strength": score,
+        },
+    )
+
+    return round(score, precision)
+
+def _calculate_buying_selling_pressure(
+    self,
+    market: MarketAnalysisProtocol,
+    signal: SignalResultProtocol,
+) -> PressureEvidence:
+    """
+    Calculate buying and selling pressure using the existing market,
+    technical and signal information.
+    """
+
+    buying_pressure = 0.0
+    selling_pressure = 0.0
+
+    observations: list[str] = []
+
+    # Trend
+    if market.trend.upper() == "BULLISH":
+        buying_pressure += 20.0
+        observations.append("Bullish trend")
+    elif market.trend.upper() == "BEARISH":
+        selling_pressure += 20.0
+        observations.append("Bearish trend")
+
+    # Momentum
+    if market.momentum.upper() == "STRONG":
+        buying_pressure += 15.0
+    elif market.momentum.upper() == "WEAK":
+        selling_pressure += 15.0
+
+    # RSI
+    if market.rsi >= 60:
+        buying_pressure += 10.0
+    elif market.rsi <= 40:
+        selling_pressure += 10.0
+
+    # MACD
+    if market.macd > market.signal_line:
+        buying_pressure += 10.0
+    else:
+        selling_pressure += 10.0
+
+    # VWAP
+    if market.last_price >= market.vwap:
+        buying_pressure += 10.0
+    else:
+        selling_pressure += 10.0
+
+    # Breakout / Breakdown
+    if market.breakout:
+        buying_pressure += 15.0
+        observations.append("Breakout confirmed")
+
+    if market.breakdown:
+        selling_pressure += 15.0
+        observations.append("Breakdown confirmed")
+
+    # Signal confidence
+    confidence_bonus = float(signal.confidence) * 0.20
+
+    if signal.signal.upper() == "BUY":
+        buying_pressure += confidence_bonus
+    elif signal.signal.upper() == "SELL":
+        selling_pressure += confidence_bonus
+
+    buying_pressure = max(
+        self._config["minimum_score"],
+        min(self._config["maximum_score"], buying_pressure),
+    )
+
+    selling_pressure = max(
+        self._config["minimum_score"],
+        min(self._config["maximum_score"], selling_pressure),
+    )
+
+    market_energy = max(buying_pressure, selling_pressure)
+
+    return PressureEvidence(
+        buying_pressure=round(
+            buying_pressure,
+            self._config["rounding_precision"],
+        ),
+        selling_pressure=round(
+            selling_pressure,
+            self._config["rounding_precision"],
+        ),
+        trend_strength=round(
+            (buying_pressure + selling_pressure) / 2,
+            self._config["rounding_precision"],
+        ),
+        momentum_strength=round(
+            float(market.strength),
+            self._config["rounding_precision"],
+        ),
+        volume_strength=50.0,
+        market_energy=round(
+            market_energy,
+            self._config["rounding_precision"],
+        ),
+        acceleration_score=round(
+            buying_pressure,
+            self._config["rounding_precision"],
+        ),
+        deceleration_score=round(
+            selling_pressure,
+            self._config["rounding_precision"],
+        ),
+        observations=tuple(observations),
+    )
+
+def _calculate_breakout_probability(
+    self,
+    market: MarketAnalysisProtocol,
+    signal: SignalResultProtocol,
+    trend_strength: float,
+    pressure: PressureEvidence,
+) -> TargetEvidence:
+    """
+    Calculate breakout, breakdown and target reach probabilities.
+    """
+
+    breakout_probability = 0.0
+    breakdown_probability = 0.0
+
+    if market.breakout:
+        breakout_probability += 35.0
+
+    if market.breakdown:
+        breakdown_probability += 35.0
+
+    breakout_probability += trend_strength * 0.30
+    breakdown_probability += (
+        pressure.selling_pressure * 0.30
+    )
+
+    if signal.signal.upper() == "BUY":
+        breakout_probability += signal.confidence * 0.20
+    elif signal.signal.upper() == "SELL":
+        breakdown_probability += signal.confidence * 0.20
+
+    breakout_probability = max(
+        self._config["minimum_score"],
+        min(
+            self._config["maximum_score"],
+            breakout_probability,
+        ),
+    )
+
+    breakdown_probability = max(
+        self._config["minimum_score"],
+        min(
+            self._config["maximum_score"],
+            breakdown_probability,
+        ),
+    )
+
+    continuation_probability = max(
+        breakout_probability,
+        trend_strength,
+    )
+
+    reversal_probability = min(
+        100.0,
+        pressure.selling_pressure,
+    )
+
+    target1 = continuation_probability
+
+    target2 = max(
+        0.0,
+        continuation_probability * 0.85,
+    )
+
+    target3 = max(
+        0.0,
+        continuation_probability * 0.70,
+    )
+
+    false_signal_probability = max(
+        0.0,
+        100.0 - continuation_probability,
+    )
+
+    return TargetEvidence(
+        target1_confidence=round(
+            target1,
+            self._config["rounding_precision"],
+        ),
+        target2_confidence=round(
+            target2,
+            self._config["rounding_precision"],
+        ),
+        target3_confidence=round(
+            target3,
+            self._config["rounding_precision"],
+        ),
+        breakout_probability=round(
+            breakout_probability,
+            self._config["rounding_precision"],
+        ),
+        breakdown_probability=round(
+            breakdown_probability,
+            self._config["rounding_precision"],
+        ),
+        continuation_probability=round(
+            continuation_probability,
+            self._config["rounding_precision"],
+        ),
+        reversal_probability=round(
+            reversal_probability,
+            self._config["rounding_precision"],
+        ),
+        false_signal_probability=round(
+            false_signal_probability,
+            self._config["rounding_precision"],
+        ),
+        observations=(
+            "Breakout probability calculated.",
+            "Target confidence estimated.",
+        ),
+    )
+
+
+def _build_movement_assessment(
+    self,
+    market: MarketAnalysisProtocol,
+    news: NewsAnalysisProtocol,
+    signal: SignalResultProtocol,
+    trend_strength: float,
+    pressure: PressureEvidence,
+    target_confidence: TargetEvidence,
+) -> MovementAssessment:
+    """
+    Build the final immutable MovementAssessment.
+    """
+
+    continuation = target_confidence.continuation_probability
+    reversal = target_confidence.reversal_probability
+
+    if continuation >= 80:
+        status = MovementStatus.STRENGTHENING.value
+    elif continuation >= 60:
+        status = MovementStatus.STABLE.value
+    elif reversal >= 70:
+        status = MovementStatus.REVERSING.value
+    else:
+        status = MovementStatus.WEAKENING.value
+
+    if continuation >= 75:
+        entry = TimingQuality.EXCELLENT.value
+    elif continuation >= 60:
+        entry = TimingQuality.GOOD.value
+    elif continuation >= 40:
+        entry = TimingQuality.FAIR.value
+    else:
+        entry = TimingQuality.AVOID.value
+
+    if reversal >= 75:
+        exit_time = TimingQuality.EXCELLENT.value
+    elif reversal >= 60:
+        exit_time = TimingQuality.GOOD.value
+    else:
+        exit_time = TimingQuality.FAIR.value
+
+    volatility = (
+        VolatilityState.HIGH.value
+        if market.atr > 0
+        else VolatilityState.NORMAL.value
+    )
+
+    acceleration = (
+        AccelerationStatus.ACCELERATING.value
+        if pressure.buying_pressure >= pressure.selling_pressure
+        else AccelerationStatus.DECELERATING.value
+    )
+
+    observation = (
+        f"{signal.signal} signal with "
+        f"{continuation:.0f}% continuation probability."
+    )
+
+    explanation = (
+        "Assessment combines trend, momentum, breakout, "
+        "technical structure and signal confidence."
+    )
+
+    return MovementAssessment(
+        ai_movement_status=status,
+        movement_strength=trend_strength,
+        movement_confidence_index=continuation,
+
+        trend_continuation_chance=continuation,
+        trend_reversal_chance=reversal,
+
+        buying_pressure=pressure.buying_pressure,
+        selling_pressure=pressure.selling_pressure,
+
+        breakout_chance=target_confidence.breakout_probability,
+        breakdown_chance=target_confidence.breakdown_probability,
+
+        target1_reach_confidence=target_confidence.target1_confidence,
+        target2_reach_confidence=target_confidence.target2_confidence,
+        target3_reach_confidence=target_confidence.target3_confidence,
+
+        entry_timing=entry,
+        exit_timing=exit_time,
+
+        acceleration_status=acceleration,
+        deceleration_status=(
+            AccelerationStatus.DECELERATING.value
+            if acceleration == AccelerationStatus.ACCELERATING.value
+            else AccelerationStatus.ACCELERATING.value
+        ),
+
+        market_energy=pressure.market_energy,
+        volatility_state=volatility,
+
+        signal_stability=continuation,
+        false_signal_risk=target_confidence.false_signal_probability,
+
+        ai_observation=observation,
+        ai_evidence_summary=(
+            *pressure.observations,
+            *target_confidence.observations,
+        ),
+        ai_explanation=explanation,
+    )
