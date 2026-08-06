@@ -1,8 +1,14 @@
 from dataclasses import dataclass
-from typing import Tuple
-from typing import Any
+from enum import Enum
 import logging
 
+from typing import (
+    Any,
+    Final,
+    Mapping,
+    Protocol,
+    Tuple,
+)
 
 @dataclass(frozen=True, slots=True)
 class MovementAssessment:
