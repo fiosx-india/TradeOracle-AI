@@ -138,7 +138,7 @@ class IndicatorEngine:
         macd = ema12 - ema26
 
         # Simple Signal Line (temporary implementation)
-        signal_line = macd
+        signal_line = macd * 0.9
 
         return round(macd, 2), round(signal_line, 2)
 
