@@ -704,6 +704,78 @@ class MovementPredictionAI:
             ),
         )
 
+    def _calculate_target_confidence(
+        self,
+        market: MarketAnalysisProtocol,
+        signal: SignalResultProtocol,
+        trend_strength: float,
+        pressure: PressureEvidence,
+        target_evidence: TargetEvidence,
+    ) -> TargetEvidence:
+        """
+        Refine target reach confidence using trend strength,
+        buying/selling pressure and breakout assessment.
+        """
+
+        continuation = target_evidence.continuation_probability
+
+        adjustment = (
+            trend_strength * 0.20
+            + pressure.buying_pressure * 0.20
+            - pressure.selling_pressure * 0.10
+        )
+
+        continuation = max(
+            self._config["minimum_score"],
+            min(
+                self._config["maximum_score"],
+                continuation + adjustment,
+            ),
+        )
+
+        target1 = continuation
+
+        target2 = max(
+            0.0,
+            continuation * 0.85,
+        )
+
+        target3 = max(
+            0.0,
+            continuation * 0.70,
+        )
+
+        false_signal = max(
+            0.0,
+            100.0 - continuation,
+        )
+
+        precision = self._config["rounding_precision"]
+
+        return TargetEvidence(
+            target1_confidence=round(target1, precision),
+            target2_confidence=round(target2, precision),
+            target3_confidence=round(target3, precision),
+
+            breakout_probability=target_evidence.breakout_probability,
+            breakdown_probability=target_evidence.breakdown_probability,
+
+            continuation_probability=round(
+                continuation,
+                precision,
+            ),
+            reversal_probability=target_evidence.reversal_probability,
+            false_signal_probability=round(
+                false_signal,
+                precision,
+            ),
+
+            observations=(
+                *target_evidence.observations,
+                "Target confidence refined.",
+            ),
+        )
+
     def _build_movement_assessment(
         self,
         market: MarketAnalysisProtocol,
