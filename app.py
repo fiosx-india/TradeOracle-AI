@@ -174,6 +174,8 @@ if page == "📈 Market Overview":
 
         symbols = list(results.items())
 
+        # ---------- Top Compact Cards ----------
+
         for row in range(0, len(symbols), 6):
 
             cols = st.columns(6)
@@ -187,83 +189,102 @@ if page == "📈 Market Overview":
                 icon = {
                     "BUY": "🟢",
                     "SELL": "🔴",
-                    "HOLD": "🟡"
+                    "HOLD": "🟡",
                 }.get(signal.signal, "⚪")
 
                 trend_icon = {
                     "BULLISH": "⬆",
                     "BEARISH": "⬇",
-                    "SIDEWAYS": "➡"
+                    "SIDEWAYS": "➡",
                 }.get(market.trend, "➡")
 
                 if movement:
-                    continue_pct = f"{movement.trend_continuation_chance:.0f}%"
+                    move = f"{movement.movement_strength:.0f}%"
                     timing = movement.entry_timing
                 else:
-                    continue_pct = "--"
+                    move = "--"
                     timing = "--"
-
-                header = (
-                    f"{icon} {symbol}\n"
-                    f"{signal.signal} {signal.confidence:.0f}% {trend_icon}\n"
-                    f"{continue_pct} • {timing}"
-                )
 
                 with col:
 
-                    with st.expander(header, expanded=False):
+                    st.markdown(
+                        f"""
+        **{icon} {symbol}**
 
-                        st.markdown("### 📊 Signal")
+        {signal.signal} • {signal.confidence:.0f}%
 
-                        st.write(f"**Trend :** {market.trend}")
-                        st.write(f"**Momentum :** {market.momentum}")
-                        st.write(f"**Signal :** {signal.signal}")
+        {trend_icon} {move}
 
-                        st.write(f"**Confidence :** {signal.confidence:.0f}%")
-                        st.write(f"**Probability :** {signal.probability:.0f}%")
+        ⚡ {timing}
+        """
+                    )
 
-                        st.divider()
+        # ---------- Full Details ----------
 
-                        st.markdown("### 💰 Trade")
+        st.divider()
 
-                        st.write(f"**Entry :** ₹{signal.entry_price:,.2f}")
-                        st.write(f"**Target :** ₹{signal.target1:,.2f}")
-                        st.write(f"**Stop Loss :** ₹{signal.stoploss:,.2f}")
+        st.markdown("## 📊 Detailed Signal Analysis")
 
-                        if movement:
+        for symbol, result in symbols:
 
-                            st.divider()
+            signal = result["signal"]
+            market = result["market"]
+            movement = result.get("movement")
 
-                            st.markdown("### 🤖 AI Movement")
+            icon = {
+                "BUY": "🟢",
+                "SELL": "🔴",
+                "HOLD": "🟡",
+            }.get(signal.signal, "⚪")
 
-                            st.write(f"**Status :** {movement.ai_movement_status}")
-                            st.write(f"**Movement :** {movement.movement_strength:.0f}%")
+            with st.expander(
+                f"{icon} {symbol} | {signal.signal} | {signal.confidence:.0f}%"
+            ):
 
-                            st.write(f"**Buying :** {movement.buying_pressure:.0f}%")
-                            st.write(f"**Selling :** {movement.selling_pressure:.0f}%")
+                st.markdown("### 📊 Signal")
 
-                            st.write(f"**Continuation :** {movement.trend_continuation_chance:.0f}%")
+                st.write(f"**Trend :** {market.trend}")
+                st.write(f"**Momentum :** {market.momentum}")
+                st.write(f"**Signal :** {signal.signal}")
+                st.write(f"**Confidence :** {signal.confidence:.0f}%")
+                st.write(f"**Probability :** {signal.probability:.0f}%")
 
-                            st.write(f"**Breakout :** {movement.breakout_chance:.0f}%")
-                            st.write(f"**Breakdown :** {movement.breakdown_chance:.0f}%")
+                st.divider()
 
-                            st.write(f"**Target-1 :** {movement.target1_reach_confidence:.0f}%")
-                            st.write(f"**Target-2 :** {movement.target2_reach_confidence:.0f}%")
-                            st.write(f"**Target-3 :** {movement.target3_reach_confidence:.0f}%")
+                st.markdown("### 💰 Trade")
 
-                            st.write(f"**False Signal :** {movement.false_signal_risk:.0f}%")
+                st.write(f"**Entry :** ₹{signal.entry_price:,.2f}")
+                st.write(f"**Target :** ₹{signal.target1:,.2f}")
+                st.write(f"**Stop Loss :** ₹{signal.stoploss:,.2f}")
 
-                            st.divider()
+                if movement:
 
-                            st.markdown("### ⚡ AI Timing")
+                    st.divider()
 
-                            st.write(f"**Entry Timing :** {movement.entry_timing}")
-                            st.write(f"**Exit Timing :** {movement.exit_timing}")
+                    st.markdown("### 🤖 AI Movement")
 
-                            st.write(f"**Market Energy :** {movement.market_energy:.0f}%")
-                            st.write(f"**Volatility :** {movement.volatility_state}")
+                    st.write(f"**Status :** {movement.ai_movement_status}")
+                    st.write(f"**Movement :** {movement.movement_strength:.0f}%")
+                    st.write(f"**Buying :** {movement.buying_pressure:.0f}%")
+                    st.write(f"**Selling :** {movement.selling_pressure:.0f}%")
+                    st.write(f"**Continuation :** {movement.trend_continuation_chance:.0f}%")
+                    st.write(f"**Breakout :** {movement.breakout_chance:.0f}%")
+                    st.write(f"**Breakdown :** {movement.breakdown_chance:.0f}%")
+                    st.write(f"**Target-1 :** {movement.target1_reach_confidence:.0f}%")
+                    st.write(f"**Target-2 :** {movement.target2_reach_confidence:.0f}%")
+                    st.write(f"**Target-3 :** {movement.target3_reach_confidence:.0f}%")
+                    st.write(f"**False Signal :** {movement.false_signal_risk:.0f}%")
 
-                            st.info(movement.ai_observation)
+                    st.divider()
+
+                    st.markdown("### ⚡ AI Timing")
+
+                    st.write(f"**Entry Timing :** {movement.entry_timing}")
+                    st.write(f"**Exit Timing :** {movement.exit_timing}")
+                    st.write(f"**Market Energy :** {movement.market_energy:.0f}%")
+                    st.write(f"**Volatility :** {movement.volatility_state}")
+
+                    st.info(movement.ai_observation)
         
             
     st.subheader("📊 Market Summary")
