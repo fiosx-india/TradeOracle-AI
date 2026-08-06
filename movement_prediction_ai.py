@@ -54,9 +54,6 @@ class MovementAssessment:
     ai_evidence_summary: Tuple[str, ...]
     ai_explanation: str
 
-from enum import Enum
-
-
 class MovementStatus(Enum):
     """Overall movement state of the existing signal."""
 
@@ -102,8 +99,6 @@ class MarketEnergy(Enum):
     MODERATE = "MODERATE"
     HIGH = "HIGH"
     VERY_HIGH = "VERY_HIGH"
-
-from typing import Final, Mapping
 
 DEFAULT_MOVEMENT_CONFIGURATION: Final[Mapping[str, float | int | bool]] = {
     # Normalized score limits
@@ -187,7 +182,6 @@ SUPPORTED_MOVEMENT_FIELDS: Final[tuple[str, ...]] = (
 
 LOGGER_NAME: Final[str] = "TradeOracle.MovementPredictionAI"
 
-from typing import Protocol
 
 
 class MarketAnalysisProtocol(Protocol):
@@ -275,9 +269,6 @@ class SignalResultProtocol(Protocol):
     stoploss: float
 
     risk_reward: float
-
-from dataclasses import dataclass
-from typing import Tuple
 
 
 @dataclass(frozen=True, slots=True)
