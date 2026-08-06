@@ -62,10 +62,7 @@ class TradeOracle:
             
             signal = self.signal.generate(report, news_report)
             
-            movement = self.movement.analyze(
-                report,
-                news_report,
-                signal,
+            movement = self.movement.analyze(report, news_report, signal)
 
             results[symbol] = {
                 "index": market_data[symbol],
