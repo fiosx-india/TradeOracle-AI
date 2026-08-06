@@ -877,3 +877,9 @@ class MovementPredictionAI:
             ),
             ai_explanation=explanation,
         )
+
+    def get_analysis_count(self) -> int:
+            """
+            Return the total number of completed movement analyses.
+            """
+            return self._analysis_count
