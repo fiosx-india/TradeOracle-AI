@@ -398,6 +398,7 @@ if page == "📈 Market Overview":
 
         market = result["market"]
         signal = result["signal"]
+          "movement": movement,
 
         with st.expander(symbol):
 
