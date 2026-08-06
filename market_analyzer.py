@@ -118,12 +118,35 @@ class MarketAnalyzer:
             result.strength += 10
             
         # ---------- Trend ----------
-        if index_data.last_price > index_data.open_price:
+
+        price_change = index_data.last_price - index_data.open_price
+
+        if price_change > 0:
+
             result.trend = "BULLISH"
-            result.bullish_score += 20
-        elif index_data.last_price < index_data.open_price:
+
+            if index_data.change_percent >= 1.5:
+                result.bullish_score += 30
+
+            elif index_data.change_percent >= 0.75:
+                result.bullish_score += 20
+
+            else:
+                result.bullish_score += 10
+
+        elif price_change < 0:
+
             result.trend = "BEARISH"
-            result.bearish_score += 20
+
+            if index_data.change_percent <= -1.5:
+                result.bearish_score += 30
+
+            elif index_data.change_percent <= -0.75:
+                result.bearish_score += 20
+
+            else:
+                result.bearish_score += 10
+
         else:
             result.trend = "SIDEWAYS"
             
