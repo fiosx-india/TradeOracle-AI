@@ -372,6 +372,13 @@ class IndicesEngine:
                                     ),
                                 },
                             )
+                            item = self.indices[symbol]
+
+                            if len(item.close_prices) == 1:
+                                item.close_prices *= 100
+                                item.high_prices *= 100
+                                item.low_prices *= 100
+                                item.volumes *= 100
 
         except Exception as error:
             print(f"F&O CSV Load Error: {error}")
