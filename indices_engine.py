@@ -88,10 +88,17 @@ class IndicesEngine:
         if item.volumes is None:
             item.volumes = []
 
-        item.close_prices.append(item.last_price)
-        item.high_prices.append(item.high_price)
-        item.low_prices.append(item.low_price)
-        item.volumes.append(item.volume)
+        if not item.close_prices or item.close_prices[-1] != item.last_price:
+            item.close_prices.append(item.last_price)
+
+        if not item.high_prices or item.high_prices[-1] != item.high_price:
+            item.high_prices.append(item.high_price)
+
+        if not item.low_prices or item.low_prices[-1] != item.low_price:
+            item.low_prices.append(item.low_price)
+
+        if not item.volumes or item.volumes[-1] != item.volume:
+            item.volumes.append(item.volume)
 
         item.close_prices = item.close_prices[-100:]
         item.high_prices = item.high_prices[-100:]
