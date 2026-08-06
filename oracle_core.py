@@ -10,6 +10,7 @@ from indices_engine import IndicesEngine
 from market_analyzer import MarketAnalyzer
 from news_analyzer import NewsAnalyzer
 from signal_engine import SignalEngine
+from movement_prediction_ai import MovementPredictionAI
 
 
 class TradeOracle:
@@ -19,6 +20,7 @@ class TradeOracle:
         self.market = MarketAnalyzer()
         self.news = NewsAnalyzer()
         self.signal = SignalEngine()
+        self.movement = MovementPredictionAI()
 
     def analyze(self):
 
@@ -59,12 +61,18 @@ class TradeOracle:
             print("Change % :", market_data[symbol].change_percent)
             
             signal = self.signal.generate(report, news_report)
+            
+            movement = self.movement.analyze(
+                report,
+                news_report,
+                signal,
 
             results[symbol] = {
                 "index": market_data[symbol],
                 "market": market_reports[symbol],
                 "news": news_report,
                 "signal": signal,
+                "movement": movement,
             }
 
         return results
