@@ -11,6 +11,8 @@ from market_analyzer import MarketAnalyzer
 from news_analyzer import NewsAnalyzer
 from signal_engine import SignalEngine
 from movement_prediction_ai import MovementPredictionAI
+from commodity_engine import CommodityEngine
+from commodity_engine import CommodityMovementPredictionAI
 
 
 class TradeOracle:
