@@ -32,6 +32,7 @@ class CommodityQuote:
 
     exchange: str = "MCX"
     currency: str = "INR"
+    movement_assessment: "MovementAssessment | None" = None
 
 class CommodityDataSource:
     """
