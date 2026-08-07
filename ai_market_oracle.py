@@ -579,7 +579,21 @@ class AIMarketOracle:
             },
         )
         
+    def _initialize_commodity_engine(
+        self,
+        data_source: CommodityDataSource,
+    ) -> None:
+        """
+        Initialize the CommodityEngine and bind it to the AI Oracle.
+        """
+        self._commodity_engine = CommodityEngine(
+            data_source=data_source,
+        )
 
+        self._logger.info(
+            "CommodityEngine initialized for AIMarketOracle."
+        )
+        
     def register_extension(
         self,
         extension: AIMarketOracleExtension,
