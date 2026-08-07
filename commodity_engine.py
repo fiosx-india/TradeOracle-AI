@@ -32,7 +32,7 @@ class CommodityQuote:
 
     exchange: str = "MCX"
     currency: str = "INR"
-    movement_assessment: "MovementAssessment | None" = None
+    movement_assessment: "CommodityMovementAssessment | None" = None
 
 class CommodityDataSource:
     """
@@ -723,8 +723,8 @@ class CommodityMovementPredictionAI:
         self._last_analysis_at: datetime | None = None
         self._last_error: Exception | None = None
 
-        self._assessment_cache: dict[str, MovementAssessment] = {}
-        self._evidence_cache: dict[str, MovementEvidence] = {}
+        self._assessment_cache: dict[str, CommodityMovementAssessment] = {}
+        self._evidence_cache: dict[str, CommodityMovementEvidence] = {}
 
         self._logger.info(
             "CommodityMovementPredictionAI initialized.",
@@ -999,8 +999,8 @@ class CommodityMovementPredictionAI:
     def _build_movement_assessment(
         self,
         quote: CommodityQuote,
-        evidence: MovementEvidence,
-    ) -> MovementAssessment:
+        evidence: CommodityMovementEvidence,
+    ) -> CommodityMovementAssessment:
         """
         Build the final AI movement assessment for a commodity.
 
