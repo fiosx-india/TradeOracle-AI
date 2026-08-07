@@ -27,6 +27,7 @@ page = st.sidebar.radio(
     [
         "📈 Market Overview",
         "🏢 F&O Companies",
+        "🪙 Commodities",
         "🟢 Buy Signals",
         "🔴 Sell Signals",
     ]
@@ -34,6 +35,36 @@ page = st.sidebar.radio(
 
 oracle = TradeOracle()
 results = oracle.analyze()
+
+
+# ==========================================================
+# COMMODITY AI RESULTS
+# ==========================================================
+
+commodity_results = {}
+
+try:
+
+    if hasattr(oracle, "commodity_engine") and hasattr(oracle, "commodity_ai"):
+
+        commodity_engine = oracle.commodity_engine
+        commodity_ai = oracle.commodity_ai
+
+        commodity_engine.refresh_if_needed()
+
+        commodities = commodity_engine.get_all_commodities()
+
+        commodity_results = (
+            commodity_ai.attach_movement_assessments(
+                commodities
+            )
+        )
+
+except Exception as exc:
+
+    commodity_results = {}
+
+    print(f"[Commodity AI] {exc}")
 
 # ==========================================================
 # AI SIGNAL DEBUG
