@@ -73,7 +73,7 @@ from commodity_engine import (
 
 from movement_prediction_ai import (
     MovementPredictionAI,
-    MovementAssessment,
+    MovementAssessment as MarketMovementAssessment,
 )
 
 LOGGER_NAME = "TradeOracle.AIMarketOracle"
@@ -243,7 +243,7 @@ class AIInsight:
     risk: RiskProfile
     reasoning: ExplainableReasoning
     timeframes: List[TimeframeAssessment]
-    movement: MovementAssessment
+    movement: MarketMovementAssessment
 
 
 class AIMarketOracleExtension(Protocol):
