@@ -203,3 +203,54 @@ class MCXDataProvider:
                 "Unexpected error while retrieving MCX commodity market data."
             )
             raise
+
+class CommodityEngine:
+    """
+    Commodity market cache and retrieval engine.
+    """
+
+    def __init__(
+        self,
+        *,
+        cache_ttl: float = 300.0,
+        logger_instance: logging.Logger | None = None,
+    ) -> None:
+        """
+        Initialize the CommodityEngine.
+
+        Args:
+            cache_ttl:
+                Default cache time-to-live, in seconds.
+
+            logger_instance:
+                Optional logger instance. When omitted, a module-level logger
+                named after this module is used.
+        """
+        self._logger: logging.Logger = (
+            logger_instance
+            if logger_instance is not None
+            else logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        )
+
+        self._cache_ttl: float = float(cache_ttl)
+        self._cache: dict[str, Any] = {}
+        self._cache_timestamp: dict[str, datetime] = {}
+
+        self._initialized_at: datetime = datetime.utcnow()
+        self._last_refresh_at: datetime | None = None
+
+        self._request_count: int = 0
+        self._cache_hits: int = 0
+        self._cache_misses: int = 0
+        self._last_error: Exception | None = None
+
+        self._healthy: bool = True
+
+        self._logger.info(
+            "CommodityEngine initialized.",
+            extra={
+                "cache_ttl": self._cache_ttl,
+                "initialized_at": self._initialized_at.isoformat(),
+            },
+        )
+
