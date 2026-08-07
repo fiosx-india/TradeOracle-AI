@@ -71,6 +71,11 @@ from commodity_engine import (
     CommodityQuote,
 )
 
+from movement_prediction_ai import (
+    MovementPredictionAI,
+    MovementAssessment,
+)
+
 LOGGER_NAME = "TradeOracle.AIMarketOracle"
 
 logger = logging.getLogger(LOGGER_NAME)
@@ -528,6 +533,7 @@ class AIMarketOracle:
         self._signal = self._oracle.signal
         self._commodity_engine = None
         self._commodity_ai = CommodityMovementPredictionAI()
+        self._movement_ai = MovementPredictionAI()
 
         # ------------------------------------------------------------------
         # Configuration
