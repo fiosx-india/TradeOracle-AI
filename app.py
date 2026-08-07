@@ -224,11 +224,11 @@ if page == "📈 Market Overview":
 
         symbols = list(results.items())
 
-        for row in range(0, len(symbols), 6):
+        for row in range(0, len(symbols), 3):
 
             cols = st.columns(3)
 
-            for col, (symbol, result) in zip(cols, symbols[row:row + 6]):
+            for col, (symbol, result) in zip(cols, symbols[row:row + 3]):
 
                 signal = result["signal"]
                 market = result["market"]
