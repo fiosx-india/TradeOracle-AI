@@ -1012,7 +1012,7 @@ class CommodityMovementPredictionAI:
                 Previously calculated movement evidence.
 
         Returns:
-            A complete MovementAssessment instance.
+            A complete CommodityMovementAssessment instance.
         """
         confidence = evidence.target_confidence
 
@@ -1075,7 +1075,7 @@ class CommodityMovementPredictionAI:
 
         precision = int(self._config["rounding_precision"])
 
-        return MovementAssessment(
+        return CommodityMovementAssessment(
             ai_movement_status=status,
             movement_strength=round(evidence.trend_strength, precision),
             movement_confidence_index=round(confidence, precision),
@@ -1096,7 +1096,7 @@ class CommodityMovementPredictionAI:
     def analyze(
         self,
         quote: CommodityQuote,
-    ) -> MovementAssessment:
+    ) -> CommodityMovementAssessment:
         """
         Analyze a commodity quote and generate a complete movement
         assessment.
@@ -1137,7 +1137,7 @@ class CommodityMovementPredictionAI:
                 )
             )
 
-            evidence = MovementEvidence(
+            evidence = CommodityMovementEvidence(
                 trend_strength=trend_strength,
                 buying_pressure=buying_pressure,
                 selling_pressure=selling_pressure,
