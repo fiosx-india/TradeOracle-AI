@@ -592,7 +592,7 @@ elif page == "🏢 F&O Companies":
     # COMMODITY DASHBOARD
     # ==========================================================
 
-        elif page == "🪙 Commodities":
+     elif page == "🪙 Commodities":
 
         st.header("🪙 Commodity AI Dashboard")
 
