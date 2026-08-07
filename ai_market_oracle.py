@@ -64,7 +64,12 @@ from oracle_core import TradeOracle
 from signal_engine import SignalResult
 from market_analyzer import MarketAnalysis
 from news_analyzer import NewsAnalysis
-
+from commodity_engine import (
+    CommodityEngine,
+    CommodityDataSource,
+    CommodityMovementPredictionAI,
+    CommodityQuote,
+)
 
 LOGGER_NAME = "TradeOracle.AIMarketOracle"
 
@@ -521,6 +526,8 @@ class AIMarketOracle:
         self._market = self._oracle.market
         self._news = self._oracle.news
         self._signal = self._oracle.signal
+        self._commodity_engine = None
+        self._commodity_ai = CommodityMovementPredictionAI()
 
         # ------------------------------------------------------------------
         # Configuration
