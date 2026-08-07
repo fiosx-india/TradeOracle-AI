@@ -588,6 +588,10 @@ elif page == "🏢 F&O Companies":
     else:
          st.warning("No analysis available for this company.")
 
+# ==========================================================
+# COMMODITY DASHBOARD
+# ==========================================================
+
 elif page == "🪙 Commodities":
 
     st.header("🪙 Commodity AI Dashboard")
@@ -603,7 +607,6 @@ elif page == "🪙 Commodities":
         movement = quote.movement_assessment
 
         rows.append({
-
             "Commodity": quote.name,
             "Symbol": quote.symbol,
             "Price": quote.last_price,
@@ -621,7 +624,7 @@ elif page == "🪙 Commodities":
     st.dataframe(
         commodity_df,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
     st.divider()
@@ -635,7 +638,6 @@ elif page == "🪙 Commodities":
             c1, c2 = st.columns(2)
 
             with c1:
-
                 st.metric("Last Price", f"{quote.last_price:.2f}")
                 st.metric("Change %", f"{quote.change_percent:.2f}%")
                 st.metric("AI Status", movement.ai_movement_status)
@@ -643,7 +645,6 @@ elif page == "🪙 Commodities":
                 st.metric("Movement", f"{movement.movement_strength:.2f}%")
 
             with c2:
-
                 st.metric("Buying", f"{movement.buying_pressure:.2f}%")
                 st.metric("Selling", f"{movement.selling_pressure:.2f}%")
                 st.metric("Breakout", f"{movement.breakout_chance:.2f}%")
@@ -666,6 +667,11 @@ elif page == "🪙 Commodities":
             )
 
             st.info(movement.ai_observation)
+
+# ==========================================================
+# BUY SIGNALS
+# ==========================================================
+
             
 elif page == "🟢 Buy Signals":
 
