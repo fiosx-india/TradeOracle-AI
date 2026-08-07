@@ -35,6 +35,40 @@ page = st.sidebar.radio(
 oracle = TradeOracle()
 results = oracle.analyze()
 
+# ==========================================================
+# AI SIGNAL DEBUG
+# ==========================================================
+
+print("\n================= AI SIGNAL DEBUG =================\n")
+
+print(f"Total Results : {len(results)}")
+print(f"Total F&O     : {len(oracle.indices.fno_symbols)}")
+
+for symbol, result in results.items():
+
+    market = result["market"]
+    signal = result["signal"]
+    movement = result.get("movement")
+
+    print(f"\n{'='*70}")
+    print(f"Symbol       : {symbol}")
+    print(f"Trend        : {market.trend}")
+    print(f"Momentum     : {market.momentum}")
+    print(f"Signal       : {signal.signal}")
+    print(f"Confidence   : {signal.confidence:.2f}%")
+    print(f"Probability  : {signal.probability:.2f}%")
+
+    if movement:
+        print(f"AI Status    : {movement.ai_movement_status}")
+        print(f"Movement     : {movement.movement_strength:.2f}%")
+        print(f"Buying       : {movement.buying_pressure:.2f}%")
+        print(f"Selling      : {movement.selling_pressure:.2f}%")
+        print(f"Continuation : {movement.trend_continuation_chance:.2f}%")
+
+print("\n================= END DEBUG =================\n")
+
+st.sidebar.divider()
+
 st.sidebar.divider()
 
 st.sidebar.subheader("🏢 F&O Companies")
