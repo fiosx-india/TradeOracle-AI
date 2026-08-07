@@ -177,7 +177,7 @@ if page == "📈 Market Overview":
         # MARKET HEALTH
         # ==========================================================
 
-        m1, m2, m3, m4, m5, m6 = st.columns(3)
+        m1, m2, m3, m4, m5, m6 = st.columns(6)
 
         with m1:
             st.metric("Market Mood", market_mood)
