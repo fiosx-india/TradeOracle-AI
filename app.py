@@ -177,7 +177,7 @@ if page == "📈 Market Overview":
         # MARKET HEALTH
         # ==========================================================
 
-        m1, m2, m3, m4, m5, m6 = st.columns(6)
+        m1, m2, m3, m4, m5, m6 = st.columns(1)
 
         with m1:
             st.metric("Market Mood", market_mood)
@@ -228,7 +228,7 @@ if page == "📈 Market Overview":
 
         for row in range(0, len(symbols), 6):
 
-            cols = st.columns(3)
+            cols = st.columns(4)
 
             for col, (symbol, result) in zip(cols, symbols[row:row + 6]):
 
