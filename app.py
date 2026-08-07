@@ -205,7 +205,20 @@ if page == "📈 Market Overview":
         # ==========================================================
 
         st.markdown("---")
-        st.subheader("🤖 AI Command Center")
+
+        title_col, action_col = st.columns([8, 1])
+
+        with title_col:
+            st.subheader("🤖 AI Command Center")
+
+        with action_col:
+            st.download_button(
+                "📄",
+                data=summary_text,
+                file_name="TradeOracle_AI_Summary.txt",
+                mime="text/plain",
+                use_container_width=True,
+            )
 
         # ==========================================================
         # MARKET HEALTH
