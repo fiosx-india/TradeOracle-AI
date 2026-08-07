@@ -622,6 +622,49 @@ class CommodityEngine:
 
         return statistics
 
+@dataclass(frozen=True, slots=True)
+class MovementEvidence:
+    """
+    Intermediate evidence collected while evaluating commodity movement.
+    """
+
+    trend_strength: float
+    buying_pressure: float
+    selling_pressure: float
+    breakout_probability: float
+    target_confidence: float
+
+
+@dataclass(frozen=True, slots=True)
+class MovementAssessment:
+    """
+    Final AI movement assessment produced for a commodity.
+    """
+
+    ai_movement_status: str
+
+    movement_strength: float
+    movement_confidence_index: float
+
+    trend_continuation_chance: float
+    trend_reversal_chance: float
+
+    buying_pressure: float
+    selling_pressure: float
+
+    breakout_chance: float
+    breakdown_chance: float
+
+    entry_timing: str
+    exit_timing: str
+
+    signal_stability: float
+    false_signal_risk: float
+
+    ai_observation: str
+
+    evidence: MovementEvidence | None = None
+
 class CommodityMovementPredictionAI:
     
     def __init__(
