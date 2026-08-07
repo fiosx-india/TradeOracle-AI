@@ -177,47 +177,25 @@ if page == "📈 Market Overview":
         # MARKET HEALTH
         # ==========================================================
 
-        metrics = [
-            ("Market Mood", market_mood),
-            ("AI Confidence", f"{best_confidence:.0f}%"),
-            ("BUY", buy_count),
-            ("SELL", sell_count),
-            ("News", "N/A"),
-            ("F&O", len(oracle.indices.fno_symbols)),
-        ]
+        m1, m2, m3, m4, m5, m6 = st.columns(6)
 
-        for i in range(0, len(metrics), 3):
+        with m1:
+            st.metric("Market Mood", market_mood)
 
-            cols = st.columns(3)
+        with m2:
+            st.metric("AI Confidence", f"{best_confidence:.0f}%")
 
-            for col, (label, value) in zip(cols, metrics[i:i + 3]):
+        with m3:
+            st.metric("BUY", buy_count)
 
-                with col:
-                    st.metric(label, value)
+        with m4:
+            st.metric("SELL", sell_count)
 
-        st.divider()
+        with m5:
+            st.metric("News", "N/A")
 
-        # ==========================================================
-        # MARKET HEALTH
-        # ==========================================================
-
-        metrics = [
-            ("Market Mood", market_mood),
-            ("AI Confidence", f"{best_confidence:.0f}%"),
-            ("BUY", buy_count),
-            ("SELL", sell_count),
-            ("News", "N/A"),
-            ("F&O", len(oracle.indices.fno_symbols)),
-        ]
-
-        for i in range(0, len(metrics), 3):
-
-            cols = st.columns(3)
-
-            for col, (label, value) in zip(cols, metrics[i:i + 3]):
-
-                with col:
-                    st.metric(label, value)
+        with m6:
+            st.metric("F&O", len(oracle.indices.fno_symbols))
 
         st.divider()
 
