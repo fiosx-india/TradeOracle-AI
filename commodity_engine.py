@@ -1197,15 +1197,10 @@ class CommodityMovementPredictionAI:
         for symbol, quote in commodities.items():
             assessment = self.analyze(quote)
 
-            try:
-                updated[symbol] = replace(
-                    quote,
-                    movement_assessment=assessment,
-                )
-            except TypeError:
-                clone = copy.copy(quote)
-                setattr(clone, "movement_assessment", assessment)
-                updated[symbol] = clone
+            updated[symbol] = replace(
+                quote,
+                movement_assessment=assessment,
+            )
 
         self._logger.debug(
             "Commodity movement assessments attached.",
