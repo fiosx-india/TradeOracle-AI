@@ -177,24 +177,26 @@ if page == "📈 Market Overview":
         # MARKET HEALTH
         # ==========================================================
 
-        m1, m2, m3, m4, m5, m6 = st.columns(6)
+        row1 = st.columns(3)
 
-        with m1:
+        with row1[0]:
             st.metric("Market Mood", market_mood)
 
-        with m2:
+        with row1[1]:
             st.metric("AI Confidence", f"{best_confidence:.0f}%")
 
-        with m3:
+        with row1[2]:
             st.metric("BUY", buy_count)
 
-        with m4:
+        row2 = st.columns(3)
+
+        with row2[0]:
             st.metric("SELL", sell_count)
 
-        with m5:
+        with row2[1]:
             st.metric("News", "N/A")
 
-        with m6:
+        with row2[2]:
             st.metric("F&O", len(oracle.indices.fno_symbols))
 
         st.divider()
