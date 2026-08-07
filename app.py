@@ -267,7 +267,38 @@ if page == "📈 Market Overview":
         # LIVE INDEX SIGNALS
         # ==========================================================
 
-        st.markdown("### 📈 Live Index Signals")
+        report_text = summary_text + "\n\n"
+
+        for symbol, result in results.items():
+
+            signal = result["signal"]
+            market = result["market"]
+
+            report_text += (
+                f"{symbol} | "
+                f"{signal.signal} | "
+                f"{signal.confidence:.0f}% | "
+                f"{signal.probability:.0f}% | "
+                f"{market.trend} | "
+                f"Entry:{signal.entry_price:.2f} | "
+                f"Target:{signal.target1:.2f} | "
+                f"SL:{signal.stoploss:.2f}\n"
+            )
+
+        title_col, action_col = st.columns([8, 1])
+
+        with title_col:
+            st.markdown("### 📈 Live Index Signals")
+
+        with action_col:
+            st.download_button(
+                "📄",
+                data=report_text,
+                file_name="TradeOracle_AI_Report.txt",
+                mime="text/plain",
+                use_container_width=True,
+                key="download_ai_report"
+            )
 
         symbols = list(results.items())
 
