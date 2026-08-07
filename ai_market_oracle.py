@@ -1443,3 +1443,102 @@ class AIMarketOracle:
         )
 
         return insight
+
+    def analyze(self) -> dict[str, AIInsight]:
+        """
+        Run the complete AI analysis pipeline for all available symbols.
+        """
+
+        market_data, market_reports, news_report = (
+            self._collect_analysis_inputs()
+        )
+
+        insights: dict[str, AIInsight] = {}
+
+        for symbol, report in market_reports.items():
+            signal = self._signal.generate(
+                report,
+                news_report,
+            )
+
+            insight = self._run_analysis_for_symbol(
+                symbol=symbol,
+                market=report,
+                news=news_report,
+                signal=signal,
+            )
+
+            insights[symbol] = insight
+
+        return insights
+
+    def analyze_symbol(
+        self,
+        symbol: str,
+    ) -> AIInsight:
+        """
+        Analyze a single trading symbol.
+        """
+
+        results = self.analyze()
+
+        try:
+            return results[symbol]
+        except KeyError as exc:
+            raise KeyError(
+                f"Unknown symbol: {symbol}"
+            ) from exc
+
+
+    def get_latest_insight(
+        self,
+        symbol: str,
+    ) -> AIInsight | None:
+        """
+        Return the most recently cached AI insight.
+        """
+        return self._latest_insights.get(symbol)
+
+    def get_market_context(
+        self,
+        symbol: str,
+    ) -> MarketContext | None:
+        """
+        Return the latest cached market context.
+        """
+        return self._market_contexts.get(symbol)
+
+    def get_statistics(self) -> dict[str, Any]:
+        """
+        Return AIMarketOracle runtime statistics.
+        """
+
+        return {
+            "analysis_count": self._analysis_count,
+            "cached_symbols": len(self._latest_insights),
+            "last_analysis_at": (
+                self._last_analysis_at.isoformat()
+                if self._last_analysis_at
+                else None
+            ),
+            "initialized_at": (
+                self._initialized_at.isoformat()
+            ),
+            "extensions": len(self._extensions),
+        }
+    def health_check(self) -> dict[str, Any]:
+        """
+        Return the operational health of AIMarketOracle.
+        """
+
+        return {
+            "healthy": True,
+            "analysis_count": self._analysis_count,
+            "cached_symbols": len(self._latest_insights),
+            "extensions": len(self._extensions),
+            "commodity_engine": (
+                self._commodity_engine is not None
+            ),
+            "commodity_ai": True,
+            "movement_ai": True,
+        }
