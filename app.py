@@ -228,7 +228,7 @@ if page == "📈 Market Overview":
 
         for row in range(0, len(symbols), 6):
 
-            cols = st.columns(6)
+            cols = st.columns(3)
 
             for col, (symbol, result) in zip(cols, symbols[row:row + 6]):
 
