@@ -216,6 +216,8 @@ if page == "📈 Market Overview":
 
         st.divider()
 
+
+
         # ==========================================================
         # LIVE INDEX SIGNALS
         # ==========================================================
@@ -259,60 +261,57 @@ if page == "📈 Market Overview":
 
                 with col:
 
-                    with st.container(border=True):
+                    with st.expander(
+                        f"{icon} {symbol}\n"
+                        f"{signal.signal} {signal.confidence:.0f}%\n"
+                        f"{trend_icon} {move}\n"
+                        f"⚡ {timing}",
+                        expanded=False,
+                    ):
 
-                        st.markdown(
-                            f"""
-        **{icon} {symbol}**
+                        st.write(f"**Trend :** {market.trend}")
+                        st.write(f"**Momentum :** {market.momentum}")
 
-        **{signal.signal}** • {signal.confidence:.0f}%
+                        st.write(f"**Confidence :** {signal.confidence:.0f}%")
+                        st.write(f"**Probability :** {signal.probability:.0f}%")
 
-        {trend_icon} {move}
+                        st.divider()
 
-        ⚡ {timing}
-        """
-                        )
+                        st.write(f"**Entry :** ₹{signal.entry_price:,.2f}")
+                        st.write(f"**Target :** ₹{signal.target1:,.2f}")
+                        st.write(f"**Stop Loss :** ₹{signal.stoploss:,.2f}")
 
-                            st.write(f"**Trend :** {market.trend}")
-                            st.write(f"**Momentum :** {market.momentum}")
-
-                            st.write(f"**Confidence :** {signal.confidence:.0f}%")
-                            st.write(f"**Probability :** {signal.probability:.0f}%")
+                        if movement:
 
                             st.divider()
 
-                            st.write(f"**Entry :** ₹{signal.entry_price:,.2f}")
-                            st.write(f"**Target :** ₹{signal.target1:,.2f}")
-                            st.write(f"**Stop Loss :** ₹{signal.stoploss:,.2f}")
+                            st.write(f"**AI Status :** {status}")
+                            st.write(f"**Movement :** {move}")
 
-                            if movement:
+                            st.write(f"**Buying :** {movement.buying_pressure:.0f}%")
+                            st.write(f"**Selling :** {movement.selling_pressure:.0f}%")
 
-                                st.divider()
+                            st.write(f"**Continuation :** {cont}")
 
-                                st.write(f"**AI Status :** {status}")
-                                st.write(f"**Movement :** {move}")
-                                st.write(f"**Buying :** {movement.buying_pressure:.0f}%")
-                                st.write(f"**Selling :** {movement.selling_pressure:.0f}%")
-                                st.write(f"**Continuation :** {cont}")
+                            st.write(f"**Breakout :** {movement.breakout_chance:.0f}%")
+                            st.write(f"**Breakdown :** {movement.breakdown_chance:.0f}%")
 
-                                st.write(f"**Breakout :** {movement.breakout_chance:.0f}%")
-                                st.write(f"**Breakdown :** {movement.breakdown_chance:.0f}%")
+                            st.write(f"**Target-1 :** {movement.target1_reach_confidence:.0f}%")
+                            st.write(f"**Target-2 :** {movement.target2_reach_confidence:.0f}%")
+                            st.write(f"**Target-3 :** {movement.target3_reach_confidence:.0f}%")
 
-                                st.write(f"**Target-1 :** {movement.target1_reach_confidence:.0f}%")
-                                st.write(f"**Target-2 :** {movement.target2_reach_confidence:.0f}%")
-                                st.write(f"**Target-3 :** {movement.target3_reach_confidence:.0f}%")
+                            st.write(f"**False Signal :** {movement.false_signal_risk:.0f}%")
 
-                                st.write(f"**False Signal :** {movement.false_signal_risk:.0f}%")
+                            st.divider()
 
-                                st.divider()
+                            st.write(f"**Entry Timing :** {movement.entry_timing}")
+                            st.write(f"**Exit Timing :** {movement.exit_timing}")
 
-                                st.write(f"**Entry Timing :** {movement.entry_timing}")
-                                st.write(f"**Exit Timing :** {movement.exit_timing}")
+                            st.write(f"**Market Energy :** {movement.market_energy:.0f}%")
+                            st.write(f"**Volatility :** {movement.volatility_state}")
 
-                                st.write(f"**Market Energy :** {movement.market_energy:.0f}%")
-                                st.write(f"**Volatility :** {movement.volatility_state}")
+                            st.info(movement.ai_observation)        
 
-                                st.info(movement.ai_observation)
         # ==========================================================
         # TOP AI PICKS
         # ==========================================================
