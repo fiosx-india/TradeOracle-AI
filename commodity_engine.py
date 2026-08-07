@@ -730,3 +730,485 @@ class CommodityMovementPredictionAI:
                 "initialized_at": self._initialized_at.isoformat(),
             },
         )
+
+    def _calculate_trend_strength(
+        self,
+        quote: CommodityQuote,
+    ) -> float:
+        """
+        Calculate a normalized trend-strength score for a commodity.
+
+        The calculation uses only public fields available on
+        ``CommodityQuote`` and produces a deterministic score in the range
+        [0.0, 100.0].
+
+        Args:
+            quote:
+                Commodity market quote.
+
+        Returns:
+            A normalized trend-strength score.
+        """
+        last_price = max(float(quote.last_price), 0.0)
+        open_price = max(float(quote.open_price), 0.0)
+        high_price = max(float(quote.high_price), last_price)
+        low_price = max(min(float(quote.low_price), high_price), 0.0)
+
+        intraday_range = max(high_price - low_price, 1e-9)
+        change_percent = abs(float(quote.change_percent))
+
+        if open_price > 0.0:
+            open_move = abs(last_price - open_price) / open_price * 100.0
+        else:
+            open_move = 0.0
+
+        range_position = (last_price - low_price) / intraday_range
+
+        direction_bias = (
+            range_position
+            if quote.change >= 0.0
+            else (1.0 - range_position)
+        )
+
+        raw_score = (
+            change_percent * 0.45
+            + open_move * 0.35
+            + direction_bias * 20.0
+        )
+
+        minimum = float(self._config.get("minimum_score", 0.0))
+        maximum = float(self._config.get("maximum_score", 100.0))
+        precision = int(self._config.get("rounding_precision", 2))
+
+        score = max(minimum, min(maximum, raw_score))
+
+        self._logger.debug(
+            "Calculated commodity trend strength.",
+            extra={
+                "symbol": quote.symbol,
+                "trend_strength": score,
+            },
+        )
+
+        return round(score, precision)
+
+    def _calculate_buying_selling_pressure(
+        self,
+        quote: CommodityQuote,
+    ) -> tuple[float, float]:
+        """
+        Calculate normalized buying and selling pressure for a commodity.
+
+        The calculation uses only fields already available on
+        ``CommodityQuote`` and returns percentage values in the range
+        [0.0, 100.0].
+
+        Args:
+            quote:
+                Commodity market quote.
+
+        Returns:
+            Tuple containing:
+                (buying_pressure, selling_pressure)
+        """
+        high_price = max(float(quote.high_price), 0.0)
+        low_price = max(float(quote.low_price), 0.0)
+        last_price = max(float(quote.last_price), 0.0)
+        volume = max(float(quote.volume), 0.0)
+
+        price_range = max(high_price - low_price, 1e-9)
+
+        price_position = (last_price - low_price) / price_range
+        price_position = max(0.0, min(1.0, price_position))
+
+        volume_factor = min(volume / 100000.0, 1.0)
+
+        buying_pressure = (
+            price_position * 70.0
+            + volume_factor * 30.0
+        )
+
+        buying_pressure = max(
+            float(self._config["minimum_score"]),
+            min(
+                float(self._config["maximum_score"]),
+                buying_pressure,
+            ),
+        )
+
+        selling_pressure = 100.0 - buying_pressure
+
+        precision = int(self._config["rounding_precision"])
+
+        buying_pressure = round(buying_pressure, precision)
+        selling_pressure = round(selling_pressure, precision)
+
+        self._logger.debug(
+            "Calculated buying/selling pressure.",
+            extra={
+                "symbol": quote.symbol,
+                "buying_pressure": buying_pressure,
+                "selling_pressure": selling_pressure,
+            },
+        )
+
+        return buying_pressure, selling_pressure
+
+    def _calculate_breakout_probability(
+        self,
+        quote: CommodityQuote,
+        trend_strength: float,
+        buying_pressure: float,
+        selling_pressure: float,
+    ) -> float:
+        """
+        Calculate the probability of a breakout.
+
+        Args:
+            quote:
+                Commodity market quote.
+
+            trend_strength:
+                Trend strength score.
+
+            buying_pressure:
+                Buying pressure score.
+
+            selling_pressure:
+                Selling pressure score.
+
+        Returns:
+            Breakout probability in the range [0.0, 100.0].
+        """
+        high_price = max(float(quote.high_price), 0.0)
+        low_price = max(float(quote.low_price), 0.0)
+        last_price = max(float(quote.last_price), 0.0)
+
+        trading_range = max(high_price - low_price, 1e-9)
+
+        range_position = (
+            (last_price - low_price) / trading_range
+        )
+
+        range_position = max(0.0, min(1.0, range_position))
+
+        pressure_advantage = max(
+            buying_pressure - selling_pressure,
+            0.0,
+        )
+
+        raw_probability = (
+            trend_strength * 0.45
+            + pressure_advantage * 0.35
+            + range_position * 20.0
+        )
+
+        minimum = float(self._config["minimum_score"])
+        maximum = float(self._config["maximum_score"])
+
+        probability = max(
+            minimum,
+            min(maximum, raw_probability),
+        )
+
+        probability = round(
+            probability,
+            int(self._config["rounding_precision"]),
+        )
+
+        self._logger.debug(
+            "Calculated breakout probability.",
+            extra={
+                "symbol": quote.symbol,
+                "breakout_probability": probability,
+            },
+        )
+
+        return probability
+
+    def _calculate_target_confidence(
+        self,
+        quote: CommodityQuote,
+        trend_strength: float,
+        breakout_probability: float,
+    ) -> float:
+        """
+        Calculate the confidence that the current movement can achieve its
+        expected target.
+
+        Args:
+            quote:
+                Commodity market quote.
+
+            trend_strength:
+                Previously calculated trend-strength score.
+
+            breakout_probability:
+                Previously calculated breakout probability.
+
+        Returns:
+            Target confidence score in the range [0.0, 100.0].
+        """
+        high_price = max(float(quote.high_price), 0.0)
+        low_price = max(float(quote.low_price), 0.0)
+        last_price = max(float(quote.last_price), 0.0)
+
+        trading_range = max(high_price - low_price, 1e-9)
+
+        range_progress = (
+            (last_price - low_price) / trading_range
+        )
+
+        range_progress = max(
+            0.0,
+            min(1.0, range_progress),
+        )
+
+        raw_confidence = (
+            trend_strength * 0.55
+            + breakout_probability * 0.30
+            + range_progress * 15.0
+        )
+
+        minimum = float(self._config["minimum_score"])
+        maximum = float(self._config["maximum_score"])
+
+        confidence = max(
+            minimum,
+            min(maximum, raw_confidence),
+        )
+
+        confidence = round(
+            confidence,
+            int(self._config["rounding_precision"]),
+        )
+
+        self._logger.debug(
+            "Calculated target confidence.",
+            extra={
+                "symbol": quote.symbol,
+                "target_confidence": confidence,
+            },
+        )
+
+        return confidence
+
+    def _build_movement_assessment(
+        self,
+        quote: CommodityQuote,
+        evidence: MovementEvidence,
+    ) -> MovementAssessment:
+        """
+        Build the final AI movement assessment for a commodity.
+
+        Args:
+            quote:
+                Commodity market quote.
+
+            evidence:
+                Previously calculated movement evidence.
+
+        Returns:
+            A complete MovementAssessment instance.
+        """
+        confidence = evidence.target_confidence
+
+        if confidence >= self._config["high_confidence_threshold"]:
+            status = "STRONG BUY" if quote.change >= 0 else "STRONG SELL"
+        elif confidence >= self._config["medium_confidence_threshold"]:
+            status = "BUY" if quote.change >= 0 else "SELL"
+        elif confidence >= self._config["low_confidence_threshold"]:
+            status = "WATCH"
+        else:
+            status = "NEUTRAL"
+
+        trend_continuation = min(
+            100.0,
+            evidence.trend_strength * 0.70 + evidence.breakout_probability * 0.30,
+        )
+
+        trend_reversal = max(
+            0.0,
+            100.0 - trend_continuation,
+        )
+
+        signal_stability = (
+            confidence * 0.60 +
+            evidence.trend_strength * 0.40
+        )
+
+        false_signal_risk = max(
+            0.0,
+            100.0 - signal_stability,
+        )
+
+        breakout_chance = evidence.breakout_probability
+        breakdown_chance = max(
+            0.0,
+            100.0 - breakout_chance,
+        )
+
+        entry_timing = (
+            "Immediate"
+            if confidence >= 80
+            else "Wait for Confirmation"
+            if confidence >= 50
+            else "Avoid Entry"
+        )
+
+        exit_timing = (
+            "Hold Trend"
+            if trend_continuation >= 70
+            else "Book Partial Profit"
+            if trend_continuation >= 50
+            else "Exit / Avoid"
+        )
+
+        observation = (
+            f"{quote.name} currently shows "
+            f"{status.lower()} characteristics with "
+            f"{confidence:.2f}% confidence."
+        )
+
+        precision = int(self._config["rounding_precision"])
+
+        return MovementAssessment(
+            ai_movement_status=status,
+            movement_strength=round(evidence.trend_strength, precision),
+            movement_confidence_index=round(confidence, precision),
+            trend_continuation_chance=round(trend_continuation, precision),
+            trend_reversal_chance=round(trend_reversal, precision),
+            buying_pressure=round(evidence.buying_pressure, precision),
+            selling_pressure=round(evidence.selling_pressure, precision),
+            breakout_chance=round(breakout_chance, precision),
+            breakdown_chance=round(breakdown_chance, precision),
+            entry_timing=entry_timing,
+            exit_timing=exit_timing,
+            signal_stability=round(signal_stability, precision),
+            false_signal_risk=round(false_signal_risk, precision),
+            ai_observation=observation,
+            evidence=evidence,
+        )
+
+    def analyze(
+        self,
+        quote: CommodityQuote,
+    ) -> MovementAssessment:
+        """
+        Analyze a commodity quote and generate a complete movement
+        assessment.
+
+        Args:
+            quote:
+                Commodity market quote.
+
+        Returns:
+            MovementAssessment for the supplied commodity.
+        """
+        self._analysis_count += 1
+        self._last_analysis_at = datetime.utcnow()
+
+        try:
+            trend_strength = self._calculate_trend_strength(quote)
+
+            buying_pressure, selling_pressure = (
+                self._calculate_buying_selling_pressure(
+                    quote,
+                )
+            )
+
+            breakout_probability = (
+                self._calculate_breakout_probability(
+                    quote,
+                    trend_strength,
+                    buying_pressure,
+                    selling_pressure,
+                )
+            )
+
+            target_confidence = (
+                self._calculate_target_confidence(
+                    quote,
+                    trend_strength,
+                    breakout_probability,
+                )
+            )
+
+            evidence = MovementEvidence(
+                trend_strength=trend_strength,
+                buying_pressure=buying_pressure,
+                selling_pressure=selling_pressure,
+                breakout_probability=breakout_probability,
+                target_confidence=target_confidence,
+            )
+
+            assessment = self._build_movement_assessment(
+                quote,
+                evidence,
+            )
+
+            self._assessment_cache[quote.symbol] = assessment
+            self._evidence_cache[quote.symbol] = evidence
+
+            self._logger.debug(
+                "Commodity movement analysis completed.",
+                extra={
+                    "symbol": quote.symbol,
+                    "confidence": assessment.movement_confidence_index,
+                },
+            )
+
+            return assessment
+
+        except Exception as exc:
+            self._last_error = exc
+
+            self._logger.exception(
+                "Commodity movement analysis failed.",
+                extra={
+                    "symbol": quote.symbol,
+                },
+            )
+
+            raise
+
+    def attach_movement_assessments(
+        self,
+        commodities: Mapping[str, CommodityQuote],
+    ) -> dict[str, CommodityQuote]:
+        """
+        Attach a ``MovementAssessment`` to every commodity quote.
+
+        Args:
+            commodities:
+                Mapping of commodity symbols to CommodityQuote objects.
+
+        Returns:
+            A new mapping containing commodity quotes with attached
+            movement assessments.
+        """
+        from dataclasses import replace
+
+        updated: dict[str, CommodityQuote] = {}
+
+        for symbol, quote in commodities.items():
+            assessment = self.analyze(quote)
+
+            try:
+                updated[symbol] = replace(
+                    quote,
+                    movement_assessment=assessment,
+                )
+            except TypeError:
+                clone = copy.copy(quote)
+                setattr(clone, "movement_assessment", assessment)
+                updated[symbol] = clone
+
+        self._logger.debug(
+            "Commodity movement assessments attached.",
+            extra={
+                "commodity_count": len(updated),
+            },
+        )
+
+        return updated
