@@ -657,6 +657,13 @@ class CommodityMovementAssessment:
 
     breakout_chance: float
     breakdown_chance: float
+    
+    target1_reach_confidence: float
+    target2_reach_confidence: float
+    target3_reach_confidence: float
+
+    market_energy: float
+    volatility_state: str
 
     entry_timing: str
     exit_timing: str
@@ -1085,6 +1092,35 @@ class CommodityMovementPredictionAI:
             selling_pressure=round(evidence.selling_pressure, precision),
             breakout_chance=round(breakout_chance, precision),
             breakdown_chance=round(breakdown_chance, precision),
+
+
+        target1_reach_confidence=round(
+            confidence,
+            precision,
+        ),
+
+        target2_reach_confidence=round(
+            min(100.0, confidence * 0.90),
+            precision,
+        ),
+
+        target3_reach_confidence=round(
+            min(100.0, confidence * 0.80),
+            precision,
+        ),
+
+        market_energy=round(
+            (evidence.trend_strength + evidence.buying_pressure) / 2,
+            precision,
+        ),
+
+        volatility_state=(
+            "HIGH"
+            if breakout_chance >= 75
+            else "MEDIUM"
+            if breakout_chance >= 45
+            else "LOW"
+        ),
             entry_timing=entry_timing,
             exit_timing=exit_timing,
             signal_stability=round(signal_stability, precision),
