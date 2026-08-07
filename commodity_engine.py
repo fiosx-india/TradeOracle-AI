@@ -211,6 +211,7 @@ class CommodityEngine:
 
     def __init__(
         self,
+        data_source: CommodityDataSource,
         *,
         cache_ttl: float = 300.0,
         logger_instance: logging.Logger | None = None,
@@ -232,6 +233,7 @@ class CommodityEngine:
             else logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         )
 
+        self._data_source = data_source
         self._cache_ttl: float = float(cache_ttl)
         self._cache: dict[str, Any] = {}
         self._cache_timestamp: dict[str, datetime] = {}
