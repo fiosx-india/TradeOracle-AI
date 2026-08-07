@@ -203,86 +203,85 @@ if page == "📈 Market Overview":
             hide_index=True
         )
 
-        # ==========================================================
-        # COMMODITY DASHBOARD
-        # ==========================================================
+# ==========================================================
+# COMMODITY DASHBOARD
+# ==========================================================
 
-        elif page == "🪙 Commodities":
+elif page == "🪙 Commodities":
 
-            st.header("🪙 Commodity AI Dashboard")
+    st.header("🪙 Commodity AI Dashboard")
 
-            if not commodity_results:
-                st.warning("No commodity data available.")
-                st.stop()
+    if not commodity_results:
+        st.warning("No commodity data available.")
+        st.stop()
 
-            rows = []
+    rows = []
 
-            for symbol, quote in commodity_results.items():
+    for symbol, quote in commodity_results.items():
 
-                movement = quote.movement_assessment
+        movement = quote.movement_assessment
 
-                rows.append({
-                    "Commodity": quote.name,
-                    "Symbol": quote.symbol,
-                    "Price": quote.last_price,
-                    "Change %": quote.change_percent,
-                    "AI Status": movement.ai_movement_status,
-                    "Movement": movement.movement_strength,
-                    "Confidence": movement.movement_confidence_index,
-                    "Buying": movement.buying_pressure,
-                    "Selling": movement.selling_pressure,
-                    "Breakout": movement.breakout_chance,
-                })
+        rows.append({
+            "Commodity": quote.name,
+            "Symbol": quote.symbol,
+            "Price": quote.last_price,
+            "Change %": quote.change_percent,
+            "AI Status": movement.ai_movement_status,
+            "Movement": movement.movement_strength,
+            "Confidence": movement.movement_confidence_index,
+            "Buying": movement.buying_pressure,
+            "Selling": movement.selling_pressure,
+            "Breakout": movement.breakout_chance,
+        })
 
-            commodity_df = pd.DataFrame(rows)
+    commodity_df = pd.DataFrame(rows)
 
-            st.dataframe(
-                commodity_df,
-                use_container_width=True,
-                hide_index=True,
-            )
+    st.dataframe(
+        commodity_df,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    st.divider()
+
+    for symbol, quote in commodity_results.items():
+
+        movement = quote.movement_assessment
+
+        with st.expander(f"{quote.name} ({symbol})"):
+
+            c1, c2 = st.columns(2)
+
+            with c1:
+                st.metric("Last Price", f"{quote.last_price:.2f}")
+                st.metric("Change %", f"{quote.change_percent:.2f}%")
+                st.metric("AI Status", movement.ai_movement_status)
+                st.metric("Confidence", f"{movement.movement_confidence_index:.2f}%")
+                st.metric("Movement", f"{movement.movement_strength:.2f}%")
+
+            with c2:
+                st.metric("Buying", f"{movement.buying_pressure:.2f}%")
+                st.metric("Selling", f"{movement.selling_pressure:.2f}%")
+                st.metric("Breakout", f"{movement.breakout_chance:.2f}%")
+                st.metric("Breakdown", f"{movement.breakdown_chance:.2f}%")
+                st.metric("False Signal", f"{movement.false_signal_risk:.2f}%")
 
             st.divider()
 
-            for symbol, quote in commodity_results.items():
+            st.write(f"**Entry Timing:** {movement.entry_timing}")
+            st.write(f"**Exit Timing:** {movement.exit_timing}")
 
-                movement = quote.movement_assessment
+            st.write(
+                f"**Trend Continuation:** "
+                f"{movement.trend_continuation_chance:.2f}%"
+            )
 
-                with st.expander(f"{quote.name} ({symbol})"):
+            st.write(
+                f"**Trend Reversal:** "
+                f"{movement.trend_reversal_chance:.2f}%"
+            )
 
-                    c1, c2 = st.columns(2)
-
-                    with c1:
-                        st.metric("Last Price", f"{quote.last_price:.2f}")
-                        st.metric("Change %", f"{quote.change_percent:.2f}%")
-                        st.metric("AI Status", movement.ai_movement_status)
-                        st.metric("Confidence", f"{movement.movement_confidence_index:.2f}%")
-                        st.metric("Movement", f"{movement.movement_strength:.2f}%")
-
-                    with c2:
-                        st.metric("Buying", f"{movement.buying_pressure:.2f}%")
-                        st.metric("Selling", f"{movement.selling_pressure:.2f}%")
-                        st.metric("Breakout", f"{movement.breakout_chance:.2f}%")
-                        st.metric("Breakdown", f"{movement.breakdown_chance:.2f}%")
-                        st.metric("False Signal", f"{movement.false_signal_risk:.2f}%")
-
-                    st.divider()
-
-                    st.write(f"**Entry Timing:** {movement.entry_timing}")
-                    st.write(f"**Exit Timing:** {movement.exit_timing}")
-
-                    st.write(
-                        f"**Trend Continuation:** "
-                        f"{movement.trend_continuation_chance:.2f}%"
-                    )
-
-                    st.write(
-                        f"**Trend Reversal:** "
-                        f"{movement.trend_reversal_chance:.2f}%"
-                    )
-
-                    st.info(movement.ai_observation)
-                    
+            st.info(movement.ai_observation)
 
         # ==========================================================
         # AI SUMMARY VALUES
