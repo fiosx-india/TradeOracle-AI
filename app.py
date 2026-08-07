@@ -177,27 +177,47 @@ if page == "📈 Market Overview":
         # MARKET HEALTH
         # ==========================================================
 
-        row1 = st.columns(3)
+        metrics = [
+            ("Market Mood", market_mood),
+            ("AI Confidence", f"{best_confidence:.0f}%"),
+            ("BUY", buy_count),
+            ("SELL", sell_count),
+            ("News", "N/A"),
+            ("F&O", len(oracle.indices.fno_symbols)),
+        ]
 
-        with row1[0]:
-            st.metric("Market Mood", market_mood)
+        for i in range(0, len(metrics), 3):
 
-        with row1[1]:
-            st.metric("AI Confidence", f"{best_confidence:.0f}%")
+            cols = st.columns(3)
 
-        with row1[2]:
-            st.metric("BUY", buy_count)
+            for col, (label, value) in zip(cols, metrics[i:i + 3]):
 
-        row2 = st.columns(3)
+                with col:
+                    st.metric(label, value)
 
-        with row2[0]:
-            st.metric("SELL", sell_count)
+        st.divider()
 
-        with row2[1]:
-            st.metric("News", "N/A")
+        # ==========================================================
+        # MARKET HEALTH
+        # ==========================================================
 
-        with row2[2]:
-            st.metric("F&O", len(oracle.indices.fno_symbols))
+        metrics = [
+            ("Market Mood", market_mood),
+            ("AI Confidence", f"{best_confidence:.0f}%"),
+            ("BUY", buy_count),
+            ("SELL", sell_count),
+            ("News", "N/A"),
+            ("F&O", len(oracle.indices.fno_symbols)),
+        ]
+
+        for i in range(0, len(metrics), 3):
+
+            cols = st.columns(3)
+
+            for col, (label, value) in zip(cols, metrics[i:i + 3]):
+
+                with col:
+                    st.metric(label, value)
 
         st.divider()
 
