@@ -243,6 +243,7 @@ class AIInsight:
     risk: RiskProfile
     reasoning: ExplainableReasoning
     timeframes: List[TimeframeAssessment]
+    movement: MovementAssessment
 
 
 class AIMarketOracleExtension(Protocol):
@@ -1287,6 +1288,12 @@ class AIMarketOracle:
             market=market,
             signal=signal,
         )
+        
+        movement_assessment = self._movement_ai.analyze(
+            market=market,
+            news=news,
+            signal=signal,
+        )
 
         return AIInsight(
             symbol=symbol,
@@ -1299,6 +1306,7 @@ class AIMarketOracle:
             risk=risk,
             reasoning=reasoning,
             timeframes=timeframe_assessments,
+            movement=movement_assessment,
         )
 
     def _collect_analysis_inputs(
