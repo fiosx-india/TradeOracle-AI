@@ -586,7 +586,7 @@ elif page == "🏢 F&O Companies":
             st.info(signal.reason)
 
     else:
-            st.warning("No analysis available for this company.")
+         st.warning("No analysis available for this company.")
 
     # ==========================================================
     # COMMODITY DASHBOARD
