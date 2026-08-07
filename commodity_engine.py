@@ -626,7 +626,7 @@ class CommodityEngine:
         return statistics
 
 @dataclass(frozen=True, slots=True)
-class MovementEvidence:
+class CommodityMovementEvidence:
     """
     Intermediate evidence collected while evaluating commodity movement.
     """
@@ -639,7 +639,7 @@ class MovementEvidence:
 
 
 @dataclass(frozen=True, slots=True)
-class MovementAssessment:
+class CommodityMovementAssessment:
     """
     Final AI movement assessment produced for a commodity.
     """
@@ -666,7 +666,7 @@ class MovementAssessment:
 
     ai_observation: str
 
-    evidence: MovementEvidence | None = None
+    evidence: CommodityMovementEvidence | None = None
 
 class CommodityMovementPredictionAI:
     
