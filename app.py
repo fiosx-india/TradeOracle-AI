@@ -273,12 +273,6 @@ if page == "📈 Market Overview":
         """
                         )
 
-                        if st.button(
-                            "Details",
-                            key=f"details_{symbol}",
-                            use_container_width=True,
-                        ):
-
                             st.write(f"**Trend :** {market.trend}")
                             st.write(f"**Momentum :** {market.momentum}")
 
