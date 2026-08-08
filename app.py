@@ -125,7 +125,7 @@ selected_company = st.sidebar.selectbox(
     label_visibility="collapsed"
 )
 
-if not results:
+if not results and page != "🪙 Commodities":
     st.error("No market data available.")
     st.stop()
 
