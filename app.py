@@ -587,7 +587,6 @@ elif page == "🏢 F&O Companies":
 
     else:
          st.warning("No analysis available for this company.")
-
 # ==========================================================
 # COMMODITY DASHBOARD
 # ==========================================================
@@ -596,9 +595,543 @@ elif page == "🪙 Commodities":
 
     st.header("🪙 Commodity AI Dashboard")
 
+    # ------------------------------------------------------
+    # NO DATA
+    # ------------------------------------------------------
+
     if not commodity_results:
         st.warning("No commodity data available.")
         st.stop()
+
+    # ======================================================
+    # 🔧 COMMODITY AI DIAGNOSTICS
+    # ======================================================
+
+    with st.expander(
+        "🔧 Commodity AI Diagnostics",
+        expanded=True,
+    ):
+
+        st.caption(
+            "Raw market data → CommodityQuote → Engine → AI calculation "
+            "→ Final assessment"
+        )
+
+        diagnostic_rows = []
+
+        for symbol, quote in commodity_results.items():
+
+            movement = quote.movement_assessment
+
+            diagnostic_rows.append({
+                # ------------------------------------------
+                # IDENTIFICATION
+                # ------------------------------------------
+                "Symbol": quote.symbol,
+                "Name": quote.name,
+
+                # ------------------------------------------
+                # RAW MARKET DATA
+                # ------------------------------------------
+                "Last Price": quote.last_price,
+                "Change": quote.change,
+                "Change %": quote.change_percent,
+                "Open": quote.open_price,
+                "High": quote.high_price,
+                "Low": quote.low_price,
+                "Volume": quote.volume,
+
+                # ------------------------------------------
+                # DATA METADATA
+                # ------------------------------------------
+                "Exchange": quote.exchange,
+                "Currency": quote.currency,
+                "Timestamp": (
+                    quote.timestamp.isoformat()
+                    if quote.timestamp is not None
+                    else None
+                ),
+
+                # ------------------------------------------
+                # AI EVIDENCE
+                # ------------------------------------------
+                "Trend Strength": (
+                    movement.evidence.trend_strength
+                    if movement and movement.evidence
+                    else None
+                ),
+
+                "Buying Pressure": (
+                    movement.evidence.buying_pressure
+                    if movement and movement.evidence
+                    else None
+                ),
+
+                "Selling Pressure": (
+                    movement.evidence.selling_pressure
+                    if movement and movement.evidence
+                    else None
+                ),
+
+                "Breakout Probability": (
+                    movement.evidence.breakout_probability
+                    if movement and movement.evidence
+                    else None
+                ),
+
+                "Target Confidence": (
+                    movement.evidence.target_confidence
+                    if movement and movement.evidence
+                    else None
+                ),
+
+                # ------------------------------------------
+                # FINAL AI OUTPUT
+                # ------------------------------------------
+                "AI Status": (
+                    movement.ai_movement_status
+                    if movement
+                    else None
+                ),
+
+                "Movement Strength": (
+                    movement.movement_strength
+                    if movement
+                    else None
+                ),
+
+                "Confidence": (
+                    movement.movement_confidence_index
+                    if movement
+                    else None
+                ),
+
+                "Trend Continuation": (
+                    movement.trend_continuation_chance
+                    if movement
+                    else None
+                ),
+
+                "Trend Reversal": (
+                    movement.trend_reversal_chance
+                    if movement
+                    else None
+                ),
+
+                "Breakout": (
+                    movement.breakout_chance
+                    if movement
+                    else None
+                ),
+
+                "Breakdown": (
+                    movement.breakdown_chance
+                    if movement
+                    else None
+                ),
+
+                "Target 1": (
+                    movement.target1_reach_confidence
+                    if movement
+                    else None
+                ),
+
+                "Target 2": (
+                    movement.target2_reach_confidence
+                    if movement
+                    else None
+                ),
+
+                "Target 3": (
+                    movement.target3_reach_confidence
+                    if movement
+                    else None
+                ),
+
+                "Market Energy": (
+                    movement.market_energy
+                    if movement
+                    else None
+                ),
+
+                "Volatility": (
+                    movement.volatility_state
+                    if movement
+                    else None
+                ),
+
+                "Signal Stability": (
+                    movement.signal_stability
+                    if movement
+                    else None
+                ),
+
+                "False Signal Risk": (
+                    movement.false_signal_risk
+                    if movement
+                    else None
+                ),
+
+                "Entry Timing": (
+                    movement.entry_timing
+                    if movement
+                    else None
+                ),
+
+                "Exit Timing": (
+                    movement.exit_timing
+                    if movement
+                    else None
+                ),
+            })
+
+        diagnostic_df = pd.DataFrame(diagnostic_rows)
+
+        # --------------------------------------------------
+        # ENGINE / DATA SUMMARY
+        # --------------------------------------------------
+
+        d1, d2, d3, d4 = st.columns(4)
+
+        with d1:
+            st.metric(
+                "Commodities Received",
+                len(commodity_results),
+            )
+
+        with d2:
+            st.metric(
+                "AI Assessments",
+                sum(
+                    1
+                    for quote in commodity_results.values()
+                    if quote.movement_assessment is not None
+                ),
+            )
+
+        with d3:
+            st.metric(
+                "Engine Cache",
+                "Available"
+                if hasattr(oracle, "commodity_engine")
+                else "Unavailable",
+            )
+
+        with d4:
+
+            if hasattr(oracle, "commodity_engine"):
+
+                try:
+                    cache_valid = (
+                        oracle.commodity_engine.is_cache_valid()
+                    )
+
+                    st.metric(
+                        "Cache Valid",
+                        "YES" if cache_valid else "NO",
+                    )
+
+                except Exception:
+                    st.metric(
+                        "Cache Valid",
+                        "ERROR",
+                    )
+
+            else:
+                st.metric(
+                    "Cache Valid",
+                    "N/A",
+                )
+
+        st.divider()
+
+        # --------------------------------------------------
+        # FULL DIAGNOSTIC TABLE
+        # --------------------------------------------------
+
+        st.markdown("### 🔍 Complete Commodity Diagnostic Data")
+
+        st.dataframe(
+            diagnostic_df,
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        # --------------------------------------------------
+        # INDIVIDUAL COMMODITY DIAGNOSTIC
+        # --------------------------------------------------
+
+        st.markdown("### 🧪 Individual Commodity Analysis")
+
+        diagnostic_symbol = st.selectbox(
+            "Select commodity to inspect",
+            sorted(commodity_results.keys()),
+            key="commodity_diagnostic_symbol",
+        )
+
+        diagnostic_quote = commodity_results[
+            diagnostic_symbol
+        ]
+
+        diagnostic_movement = (
+            diagnostic_quote.movement_assessment
+        )
+
+        if diagnostic_movement:
+
+            st.markdown(
+                f"#### {diagnostic_quote.name} "
+                f"({diagnostic_quote.symbol})"
+            )
+
+            # ----------------------------------------------
+            # RAW DATA
+            # ----------------------------------------------
+
+            st.markdown("##### 1️⃣ Raw Market Data")
+
+            r1, r2, r3, r4 = st.columns(4)
+
+            with r1:
+                st.metric(
+                    "Last Price",
+                    f"{diagnostic_quote.last_price:,.2f}",
+                )
+
+                st.metric(
+                    "Change",
+                    f"{diagnostic_quote.change:,.2f}",
+                )
+
+            with r2:
+                st.metric(
+                    "Change %",
+                    f"{diagnostic_quote.change_percent:.2f}%",
+                )
+
+                st.metric(
+                    "Volume",
+                    f"{diagnostic_quote.volume:,}",
+                )
+
+            with r3:
+                st.metric(
+                    "Open",
+                    f"{diagnostic_quote.open_price:,.2f}",
+                )
+
+                st.metric(
+                    "High",
+                    f"{diagnostic_quote.high_price:,.2f}",
+                )
+
+            with r4:
+                st.metric(
+                    "Low",
+                    f"{diagnostic_quote.low_price:,.2f}",
+                )
+
+                st.metric(
+                    "Exchange",
+                    diagnostic_quote.exchange,
+                )
+
+            st.divider()
+
+            # ----------------------------------------------
+            # AI EVIDENCE
+            # ----------------------------------------------
+
+            st.markdown("##### 2️⃣ AI Evidence")
+
+            evidence = diagnostic_movement.evidence
+
+            if evidence:
+
+                e1, e2, e3, e4, e5 = st.columns(5)
+
+                with e1:
+                    st.metric(
+                        "Trend Strength",
+                        f"{evidence.trend_strength:.2f}%",
+                    )
+
+                with e2:
+                    st.metric(
+                        "Buying Pressure",
+                        f"{evidence.buying_pressure:.2f}%",
+                    )
+
+                with e3:
+                    st.metric(
+                        "Selling Pressure",
+                        f"{evidence.selling_pressure:.2f}%",
+                    )
+
+                with e4:
+                    st.metric(
+                        "Breakout Probability",
+                        f"{evidence.breakout_probability:.2f}%",
+                    )
+
+                with e5:
+                    st.metric(
+                        "Target Confidence",
+                        f"{evidence.target_confidence:.2f}%",
+                    )
+
+            else:
+
+                st.warning(
+                    "No AI evidence object is attached."
+                )
+
+            st.divider()
+
+            # ----------------------------------------------
+            # FINAL AI OUTPUT
+            # ----------------------------------------------
+
+            st.markdown("##### 3️⃣ Final AI Assessment")
+
+            a1, a2, a3, a4 = st.columns(4)
+
+            with a1:
+                st.metric(
+                    "AI Status",
+                    diagnostic_movement.ai_movement_status,
+                )
+
+            with a2:
+                st.metric(
+                    "Movement Strength",
+                    f"{diagnostic_movement.movement_strength:.2f}%",
+                )
+
+            with a3:
+                st.metric(
+                    "Confidence",
+                    f"{diagnostic_movement.movement_confidence_index:.2f}%",
+                )
+
+            with a4:
+                st.metric(
+                    "Market Energy",
+                    f"{diagnostic_movement.market_energy:.2f}%",
+                )
+
+            a5, a6, a7, a8 = st.columns(4)
+
+            with a5:
+                st.metric(
+                    "Trend Continuation",
+                    f"{diagnostic_movement.trend_continuation_chance:.2f}%",
+                )
+
+            with a6:
+                st.metric(
+                    "Trend Reversal",
+                    f"{diagnostic_movement.trend_reversal_chance:.2f}%",
+                )
+
+            with a7:
+                st.metric(
+                    "Breakout",
+                    f"{diagnostic_movement.breakout_chance:.2f}%",
+                )
+
+            with a8:
+                st.metric(
+                    "Breakdown",
+                    f"{diagnostic_movement.breakdown_chance:.2f}%",
+                )
+
+            st.divider()
+
+            # ----------------------------------------------
+            # TARGET / RISK OUTPUT
+            # ----------------------------------------------
+
+            st.markdown("##### 4️⃣ Target & Signal Quality")
+
+            t1, t2, t3, t4 = st.columns(4)
+
+            with t1:
+                st.metric(
+                    "Target 1 Confidence",
+                    f"{diagnostic_movement.target1_reach_confidence:.2f}%",
+                )
+
+            with t2:
+                st.metric(
+                    "Target 2 Confidence",
+                    f"{diagnostic_movement.target2_reach_confidence:.2f}%",
+                )
+
+            with t3:
+                st.metric(
+                    "Target 3 Confidence",
+                    f"{diagnostic_movement.target3_reach_confidence:.2f}%",
+                )
+
+            with t4:
+                st.metric(
+                    "False Signal Risk",
+                    f"{diagnostic_movement.false_signal_risk:.2f}%",
+                )
+
+            q1, q2, q3, q4 = st.columns(4)
+
+            with q1:
+                st.metric(
+                    "Signal Stability",
+                    f"{diagnostic_movement.signal_stability:.2f}%",
+                )
+
+            with q2:
+                st.metric(
+                    "Volatility",
+                    diagnostic_movement.volatility_state,
+                )
+
+            with q3:
+                st.metric(
+                    "Entry Timing",
+                    diagnostic_movement.entry_timing,
+                )
+
+            with q4:
+                st.metric(
+                    "Exit Timing",
+                    diagnostic_movement.exit_timing,
+                )
+
+            st.divider()
+
+            # ----------------------------------------------
+            # AI OBSERVATION
+            # ----------------------------------------------
+
+            st.markdown("##### 5️⃣ AI Observation")
+
+            st.info(
+                diagnostic_movement.ai_observation
+            )
+
+            # ----------------------------------------------
+            # TIMESTAMP
+            # ----------------------------------------------
+
+            st.caption(
+                f"Quote Timestamp: "
+                f"{diagnostic_quote.timestamp.isoformat()}"
+            )
+
+    # ======================================================
+    # NORMAL COMMODITY TABLE
+    # ======================================================
+
+    st.markdown("### 📊 Commodity Overview")
 
     rows = []
 
@@ -611,12 +1144,36 @@ elif page == "🪙 Commodities":
             "Symbol": quote.symbol,
             "Price": quote.last_price,
             "Change %": quote.change_percent,
-            "AI Status": movement.ai_movement_status,
-            "Movement": movement.movement_strength,
-            "Confidence": movement.movement_confidence_index,
-            "Buying": movement.buying_pressure,
-            "Selling": movement.selling_pressure,
-            "Breakout": movement.breakout_chance,
+            "AI Status": (
+                movement.ai_movement_status
+                if movement
+                else "--"
+            ),
+            "Movement": (
+                movement.movement_strength
+                if movement
+                else None
+            ),
+            "Confidence": (
+                movement.movement_confidence_index
+                if movement
+                else None
+            ),
+            "Buying": (
+                movement.buying_pressure
+                if movement
+                else None
+            ),
+            "Selling": (
+                movement.selling_pressure
+                if movement
+                else None
+            ),
+            "Breakout": (
+                movement.breakout_chance
+                if movement
+                else None
+            ),
         })
 
     commodity_df = pd.DataFrame(rows)
@@ -629,32 +1186,91 @@ elif page == "🪙 Commodities":
 
     st.divider()
 
+    # ======================================================
+    # COMMODITY DETAILS
+    # ======================================================
+
     for symbol, quote in commodity_results.items():
 
         movement = quote.movement_assessment
 
-        with st.expander(f"{quote.name} ({symbol})"):
+        with st.expander(
+            f"{quote.name} ({symbol})"
+        ):
+
+            if movement is None:
+                st.warning(
+                    "No movement assessment available."
+                )
+                continue
 
             c1, c2 = st.columns(2)
 
             with c1:
-                st.metric("Last Price", f"{quote.last_price:.2f}")
-                st.metric("Change %", f"{quote.change_percent:.2f}%")
-                st.metric("AI Status", movement.ai_movement_status)
-                st.metric("Confidence", f"{movement.movement_confidence_index:.2f}%")
-                st.metric("Movement", f"{movement.movement_strength:.2f}%")
+
+                st.metric(
+                    "Last Price",
+                    f"{quote.last_price:.2f}",
+                )
+
+                st.metric(
+                    "Change %",
+                    f"{quote.change_percent:.2f}%",
+                )
+
+                st.metric(
+                    "AI Status",
+                    movement.ai_movement_status,
+                )
+
+                st.metric(
+                    "Confidence",
+                    f"{movement.movement_confidence_index:.2f}%",
+                )
+
+                st.metric(
+                    "Movement",
+                    f"{movement.movement_strength:.2f}%",
+                )
 
             with c2:
-                st.metric("Buying", f"{movement.buying_pressure:.2f}%")
-                st.metric("Selling", f"{movement.selling_pressure:.2f}%")
-                st.metric("Breakout", f"{movement.breakout_chance:.2f}%")
-                st.metric("Breakdown", f"{movement.breakdown_chance:.2f}%")
-                st.metric("False Signal", f"{movement.false_signal_risk:.2f}%")
+
+                st.metric(
+                    "Buying",
+                    f"{movement.buying_pressure:.2f}%",
+                )
+
+                st.metric(
+                    "Selling",
+                    f"{movement.selling_pressure:.2f}%",
+                )
+
+                st.metric(
+                    "Breakout",
+                    f"{movement.breakout_chance:.2f}%",
+                )
+
+                st.metric(
+                    "Breakdown",
+                    f"{movement.breakdown_chance:.2f}%",
+                )
+
+                st.metric(
+                    "False Signal",
+                    f"{movement.false_signal_risk:.2f}%",
+                )
 
             st.divider()
 
-            st.write(f"**Entry Timing:** {movement.entry_timing}")
-            st.write(f"**Exit Timing:** {movement.exit_timing}")
+            st.write(
+                f"**Entry Timing:** "
+                f"{movement.entry_timing}"
+            )
+
+            st.write(
+                f"**Exit Timing:** "
+                f"{movement.exit_timing}"
+            )
 
             st.write(
                 f"**Trend Continuation:** "
@@ -666,11 +1282,9 @@ elif page == "🪙 Commodities":
                 f"{movement.trend_reversal_chance:.2f}%"
             )
 
-            st.info(movement.ai_observation)
-
-# ==========================================================
-# BUY SIGNALS
-# ==========================================================
+            st.info(
+                movement.ai_observation
+            )
 
             
 elif page == "🟢 Buy Signals":
