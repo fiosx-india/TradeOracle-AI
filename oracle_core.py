@@ -11,11 +11,7 @@ from market_analyzer import MarketAnalyzer
 from news_analyzer import NewsAnalyzer
 from signal_engine import SignalEngine
 from movement_prediction_ai import MovementPredictionAI
-from commodity_engine import (
-    CommodityEngine,
-    CommodityDataSource,
-    CommodityMovementPredictionAI,
-)
+from commodity_engine import CommodityMovementPredictionAI
 
 class TradeOracle:
     def __init__(self):
@@ -25,6 +21,7 @@ class TradeOracle:
         self.news = NewsAnalyzer()
         self.signal = SignalEngine()
         self.movement = MovementPredictionAI()
+        self.commodity_movement = CommodityMovementPredictionAI()
 
     def analyze(self):
 
