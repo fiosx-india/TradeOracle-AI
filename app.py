@@ -587,7 +587,6 @@ elif page == "🏢 F&O Companies":
 
     else:
          st.warning("No analysis available for this company.")
-        
 # ==========================================================
 # COMMODITY DASHBOARD
 # ==========================================================
@@ -606,37 +605,55 @@ elif page == "🪙 Commodities":
     ):
 
         st.caption(
-            "MCX Data → Commodity Provider → CommodityEngine "
-            "→ Commodity Results → AI Assessment"
+            "Market Data Source → Commodity Provider → "
+            "CommodityEngine → Commodity Results → AI Assessment"
         )
 
-        # --------------------------------------------------
-        # 1. RAW commodity_results STATUS
-        # --------------------------------------------------
+        # ==================================================
+        # 1️⃣ COMMODITY RESULTS STATUS
+        # ==================================================
 
         st.markdown("### 1️⃣ Commodity Results")
 
         d1, d2, d3, d4 = st.columns(4)
 
+        # --------------------------------------------------
+        # Object Type
+        # --------------------------------------------------
+
         with d1:
+
             st.metric(
                 "Object Type",
                 type(commodity_results).__name__,
             )
 
+        # --------------------------------------------------
+        # Commodity Count
+        # --------------------------------------------------
+
         with d2:
-            try:
+
+            if isinstance(commodity_results, dict):
+
                 st.metric(
                     "Commodity Count",
                     len(commodity_results),
                 )
-            except Exception:
+
+            else:
+
                 st.metric(
                     "Commodity Count",
-                    "ERROR",
+                    "INVALID",
                 )
 
+        # --------------------------------------------------
+        # Mapping
+        # --------------------------------------------------
+
         with d3:
+
             st.metric(
                 "Is Mapping",
                 "YES"
@@ -644,106 +661,230 @@ elif page == "🪙 Commodities":
                 else "NO",
             )
 
-        with d4:
-            st.metric(
-                "Status",
-                "DATA RECEIVED"
-                if commodity_results
-                else "EMPTY",
-            )
+        # --------------------------------------------------
+        # Status
+        # --------------------------------------------------
 
-        # --------------------------------------------------
-        # 2. COMMODITY ENGINE STATUS
-        # --------------------------------------------------
+        with d4:
+
+            if commodity_results:
+
+                st.metric(
+                    "Status",
+                    "DATA RECEIVED",
+                )
+
+            else:
+
+                st.metric(
+                    "Status",
+                    "EMPTY",
+                )
+
+        # ==================================================
+        # 2️⃣ COMMODITY ENGINE STATUS
+        # ==================================================
 
         st.markdown("### 2️⃣ Commodity Engine")
 
-        if hasattr(oracle, "commodity_engine"):
+        engine = getattr(
+            oracle,
+            "commodity_engine",
+            None,
+        )
 
-            engine = oracle.commodity_engine
+        if engine is None:
+
+            st.error(
+                "❌ oracle.commodity_engine is not available."
+            )
+
+        else:
+
+            # ------------------------------------------------
+            # Read health ONCE
+            # ------------------------------------------------
+
+            try:
+
+                health = engine.health_check()
+
+            except Exception as exc:
+
+                health = {
+                    "healthy": False,
+                    "cache_status": "ERROR",
+                    "cache_valid": False,
+                    "cached_commodities": 0,
+                    "last_refresh_at": None,
+                    "last_error": {
+                        "type": type(exc).__name__,
+                        "message": str(exc),
+                    },
+                }
+
+            # ------------------------------------------------
+            # Engine metrics
+            # ------------------------------------------------
 
             e1, e2, e3, e4 = st.columns(4)
 
             with e1:
+
                 st.metric(
                     "Engine",
                     "AVAILABLE",
                 )
 
             with e2:
-                try:
-                    st.metric(
-                        "Cache Valid",
-                        "YES"
-                        if engine.is_cache_valid()
-                        else "NO",
-                    )
-                except Exception:
-                    st.metric(
-                        "Cache Valid",
-                        "ERROR",
-                    )
+
+                st.metric(
+                    "Cache Valid",
+                    "YES"
+                    if health.get("cache_valid")
+                    else "NO",
+                )
 
             with e3:
-                try:
-                    engine_data = engine.get_all_commodities()
 
-                    st.metric(
-                        "Engine Cache",
-                        len(engine_data),
-                    )
-
-                except Exception:
-                    st.metric(
-                        "Engine Cache",
-                        "EMPTY",
-                    )
+                st.metric(
+                    "Engine Cache",
+                    health.get(
+                        "cached_commodities",
+                        0,
+                    ),
+                )
 
             with e4:
-                try:
-                    health = engine.health_check()
 
-                    st.metric(
-                        "Engine Healthy",
-                        "YES"
-                        if health.get("healthy")
-                        else "NO",
-                    )
+                st.metric(
+                    "Engine Healthy",
+                    "YES"
+                    if health.get("healthy")
+                    else "NO",
+                )
 
-                except Exception:
-                    st.metric(
-                        "Engine Healthy",
-                        "ERROR",
-                    )
+            # ------------------------------------------------
+            # Engine health details
+            # ------------------------------------------------
 
-            # ----------------------------------------------
-            # ENGINE HEALTH DETAILS
-            # ----------------------------------------------
-
-            try:
-
-                health = engine.health_check()
+            with st.expander(
+                "Engine Health Details",
+                expanded=False,
+            ):
 
                 st.json(health)
 
-            except Exception as exc:
+        # ==================================================
+        # 3️⃣ ACTUAL MARKET DATA SOURCE
+        # ==================================================
 
-                st.error(
-                    f"Unable to read CommodityEngine health: "
-                    f"{type(exc).__name__}: {exc}"
-                )
+        st.markdown("### 3️⃣ Market Data Source")
 
-        else:
+        s1, s2, s3, s4 = st.columns(4)
 
-            st.error(
-                "❌ oracle.commodity_engine is not available."
+        with s1:
+
+            st.metric(
+                "Provider",
+                "Yahoo Finance",
             )
 
-        # --------------------------------------------------
-        # 3. COMMODITY RESULTS CONTENT
-        # --------------------------------------------------
+        with s2:
 
-        st.markdown("### 3️⃣ Commodity Results Content")
+            st.metric(
+                "Library",
+                "yfinance",
+            )
+
+        with s3:
+
+            st.metric(
+                "API Key",
+                "NOT REQUIRED",
+            )
+
+        with s4:
+
+            st.metric(
+                "Official MCX Feed",
+                "NO",
+            )
+
+        st.info(
+            "Current API-key-free test source is Yahoo Finance futures "
+            "data through yfinance. It provides real returned market "
+            "data, but it is NOT an official MCX market-data feed."
+        )
+
+        st.caption(
+            "The existing fetch_mcx_commodities() function name is "
+            "retained only for backward compatibility with the "
+            "CommodityEngine pipeline."
+        )
+
+        # ==================================================
+        # 4️⃣ SOURCE SYMBOL MAPPING
+        # ==================================================
+
+        st.markdown("### 4️⃣ Commodity Source Mapping")
+
+        source_mapping = [
+            {
+                "Name": "Gold",
+                "Source Symbol": "GC=F",
+                "Source": "Yahoo Finance Futures",
+                "Exchange Label": "Yahoo Finance Futures",
+                "Currency": "USD",
+            },
+            {
+                "Name": "Silver",
+                "Source Symbol": "SI=F",
+                "Source": "Yahoo Finance Futures",
+                "Exchange Label": "Yahoo Finance Futures",
+                "Currency": "USD",
+            },
+            {
+                "Name": "Crude Oil",
+                "Source Symbol": "CL=F",
+                "Source": "Yahoo Finance Futures",
+                "Exchange Label": "Yahoo Finance Futures",
+                "Currency": "USD",
+            },
+            {
+                "Name": "Natural Gas",
+                "Source Symbol": "NG=F",
+                "Source": "Yahoo Finance Futures",
+                "Exchange Label": "Yahoo Finance Futures",
+                "Currency": "USD",
+            },
+            {
+                "Name": "Copper",
+                "Source Symbol": "HG=F",
+                "Source": "Yahoo Finance Futures",
+                "Exchange Label": "Yahoo Finance Futures",
+                "Currency": "USD",
+            },
+            {
+                "Name": "Platinum",
+                "Source Symbol": "PL=F",
+                "Source": "Yahoo Finance Futures",
+                "Exchange Label": "Yahoo Finance Futures",
+                "Currency": "USD",
+            },
+        ]
+
+        st.dataframe(
+            pd.DataFrame(source_mapping),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        # ==================================================
+        # 5️⃣ COMMODITY RESULTS CONTENT
+        # ==================================================
+
+        st.markdown("### 5️⃣ Commodity Results Content")
 
         if commodity_results:
 
@@ -757,7 +898,17 @@ elif page == "🪙 Commodities":
                     None,
                 )
 
+                timestamp = getattr(
+                    quote,
+                    "timestamp",
+                    None,
+                )
+
                 diagnostic_rows.append({
+
+                    # --------------------------------------
+                    # IDENTITY
+                    # --------------------------------------
 
                     "Symbol": getattr(
                         quote,
@@ -770,6 +921,26 @@ elif page == "🪙 Commodities":
                         "name",
                         None,
                     ),
+
+                    # --------------------------------------
+                    # SOURCE
+                    # --------------------------------------
+
+                    "Exchange / Source": getattr(
+                        quote,
+                        "exchange",
+                        None,
+                    ),
+
+                    "Currency": getattr(
+                        quote,
+                        "currency",
+                        None,
+                    ),
+
+                    # --------------------------------------
+                    # MARKET DATA
+                    # --------------------------------------
 
                     "Last Price": getattr(
                         quote,
@@ -813,24 +984,124 @@ elif page == "🪙 Commodities":
                         None,
                     ),
 
+                    # --------------------------------------
+                    # TIMESTAMP
+                    # --------------------------------------
+
                     "Timestamp": (
-                        getattr(
-                            quote,
-                            "timestamp",
-                            None,
-                        ).isoformat()
-                        if getattr(
-                            quote,
-                            "timestamp",
-                            None,
-                        )
+                        timestamp.isoformat()
+                        if timestamp is not None
                         else None
                     ),
+
+                    # --------------------------------------
+                    # AI PIPELINE
+                    # --------------------------------------
 
                     "AI Assessment": (
                         "AVAILABLE"
                         if movement is not None
                         else "MISSING"
+                    ),
+
+                    "AI Status": (
+                        getattr(
+                            movement,
+                            "ai_movement_status",
+                            None,
+                        )
+                        if movement
+                        else None
+                    ),
+
+                    "Movement Strength": (
+                        getattr(
+                            movement,
+                            "movement_strength",
+                            None,
+                        )
+                        if movement
+                        else None
+                    ),
+
+                    "Confidence": (
+                        getattr(
+                            movement,
+                            "movement_confidence_index",
+                            None,
+                        )
+                        if movement
+                        else None
+                    ),
+
+                    "Buying Pressure": (
+                        getattr(
+                            movement,
+                            "buying_pressure",
+                            None,
+                        )
+                        if movement
+                        else None
+                    ),
+
+                    "Selling Pressure": (
+                        getattr(
+                            movement,
+                            "selling_pressure",
+                            None,
+                        )
+                        if movement
+                        else None
+                    ),
+
+                    "Breakout": (
+                        getattr(
+                            movement,
+                            "breakout_chance",
+                            None,
+                        )
+                        if movement
+                        else None
+                    ),
+
+                    "Breakdown": (
+                        getattr(
+                            movement,
+                            "breakdown_chance",
+                            None,
+                        )
+                        if movement
+                        else None
+                    ),
+
+                    "Trend Continuation": (
+                        getattr(
+                            movement,
+                            "trend_continuation_chance",
+                            None,
+                        )
+                        if movement
+                        else None
+                    ),
+
+                    "Trend Reversal": (
+                        getattr(
+                            movement,
+                            "trend_reversal_chance",
+                            None,
+                        )
+                        if movement
+                        else None
+                    ),
+
+                    "False Signal Risk": (
+                        getattr(
+                            movement,
+                            "false_signal_risk",
+                            None,
+                        )
+                        if movement
+                        else None
                     ),
                 })
 
@@ -850,91 +1121,425 @@ elif page == "🪙 Commodities":
                 "⚠️ commodity_results is EMPTY."
             )
 
+            # ----------------------------------------------
+            # Show engine error when available
+            # ----------------------------------------------
+
+            if engine is not None:
+
+                try:
+
+                    engine_health = engine.health_check()
+
+                    last_error = engine_health.get(
+                        "last_error"
+                    )
+
+                    if last_error:
+
+                        st.error(
+                            f"Provider / Engine Error: "
+                            f"{last_error.get('type', 'Unknown')}: "
+                            f"{last_error.get('message', 'Unknown error')}"
+                        )
+
+                except Exception:
+                    pass
+
             st.info(
-                "The dashboard is receiving no normalized commodity "
-                "records. The problem is upstream of the dashboard."
+                "No normalized commodity records reached the "
+                "dashboard. Check the provider and CommodityEngine."
             )
 
-        # --------------------------------------------------
-        # 4. CONFIGURATION CHECK
-        # --------------------------------------------------
+        # ==================================================
+        # 6️⃣ SELECTED COMMODITY DEEP DIAGNOSTICS
+        # ==================================================
 
-        st.markdown("### 4️⃣ MCX Provider Configuration")
+        if commodity_results:
 
-        import os
+            st.markdown(
+                "### 6️⃣ Individual Commodity Diagnostics"
+            )
 
-        api_url = os.getenv(
-            "MCX_COMMODITY_API_URL",
-            "",
+            selected_symbol = st.selectbox(
+                "Select commodity",
+                sorted(
+                    commodity_results.keys()
+                ),
+                key="commodity_diagnostic_symbol",
+            )
+
+            selected_quote = commodity_results[
+                selected_symbol
+            ]
+
+            selected_movement = getattr(
+                selected_quote,
+                "movement_assessment",
+                None,
+            )
+
+            st.markdown(
+                f"#### {getattr(selected_quote, 'name', selected_symbol)} "
+                f"({getattr(selected_quote, 'symbol', selected_symbol)})"
+            )
+
+            # ==================================================
+            # RAW MARKET DATA
+            # ==================================================
+
+            st.markdown(
+                "##### 6.1️⃣ Raw Market Data"
+            )
+
+            r1, r2, r3, r4 = st.columns(4)
+
+            with r1:
+
+                st.metric(
+                    "Last Price",
+                    f"{getattr(selected_quote, 'last_price', 0):,.4f}",
+                )
+
+                st.metric(
+                    "Change",
+                    f"{getattr(selected_quote, 'change', 0):,.4f}",
+                )
+
+            with r2:
+
+                st.metric(
+                    "Change %",
+                    f"{getattr(selected_quote, 'change_percent', 0):.4f}%",
+                )
+
+                st.metric(
+                    "Volume",
+                    f"{getattr(selected_quote, 'volume', 0):,}",
+                )
+
+            with r3:
+
+                st.metric(
+                    "Open",
+                    f"{getattr(selected_quote, 'open_price', 0):,.4f}",
+                )
+
+                st.metric(
+                    "High",
+                    f"{getattr(selected_quote, 'high_price', 0):,.4f}",
+                )
+
+            with r4:
+
+                st.metric(
+                    "Low",
+                    f"{getattr(selected_quote, 'low_price', 0):,.4f}",
+                )
+
+                st.metric(
+                    "Currency",
+                    getattr(
+                        selected_quote,
+                        "currency",
+                        "--",
+                    ),
+                )
+
+            timestamp = getattr(
+                selected_quote,
+                "timestamp",
+                None,
+            )
+
+            if timestamp:
+
+                st.caption(
+                    f"Market Data Timestamp: "
+                    f"{timestamp.isoformat()}"
+                )
+
+            st.divider()
+
+            # ==================================================
+            # AI EVIDENCE
+            # ==================================================
+
+            st.markdown(
+                "##### 6.2️⃣ AI Evidence"
+            )
+
+            if selected_movement is not None:
+
+                evidence = getattr(
+                    selected_movement,
+                    "evidence",
+                    None,
+                )
+
+                if evidence:
+
+                    e1, e2, e3, e4, e5 = st.columns(5)
+
+                    with e1:
+
+                        st.metric(
+                            "Trend Strength",
+                            f"{getattr(evidence, 'trend_strength', 0):.2f}%",
+                        )
+
+                    with e2:
+
+                        st.metric(
+                            "Buying Pressure",
+                            f"{getattr(evidence, 'buying_pressure', 0):.2f}%",
+                        )
+
+                    with e3:
+
+                        st.metric(
+                            "Selling Pressure",
+                            f"{getattr(evidence, 'selling_pressure', 0):.2f}%",
+                        )
+
+                    with e4:
+
+                        st.metric(
+                            "Breakout Probability",
+                            f"{getattr(evidence, 'breakout_probability', 0):.2f}%",
+                        )
+
+                    with e5:
+
+                        st.metric(
+                            "Target Confidence",
+                            f"{getattr(evidence, 'target_confidence', 0):.2f}%",
+                        )
+
+                else:
+
+                    st.warning(
+                        "AI movement assessment exists, "
+                        "but no evidence object is attached."
+                    )
+
+            else:
+
+                st.warning(
+                    "No AI movement assessment is attached."
+                )
+
+            st.divider()
+
+            # ==================================================
+            # FINAL AI ASSESSMENT
+            # ==================================================
+
+            st.markdown(
+                "##### 6.3️⃣ Final AI Assessment"
+            )
+
+            if selected_movement is not None:
+
+                a1, a2, a3, a4 = st.columns(4)
+
+                with a1:
+
+                    st.metric(
+                        "AI Status",
+                        getattr(
+                            selected_movement,
+                            "ai_movement_status",
+                            "--",
+                        ),
+                    )
+
+                with a2:
+
+                    st.metric(
+                        "Movement Strength",
+                        f"{getattr(selected_movement, 'movement_strength', 0):.2f}%",
+                    )
+
+                with a3:
+
+                    st.metric(
+                        "Confidence",
+                        f"{getattr(selected_movement, 'movement_confidence_index', 0):.2f}%",
+                    )
+
+                with a4:
+
+                    st.metric(
+                        "Market Energy",
+                        f"{getattr(selected_movement, 'market_energy', 0):.2f}%",
+                    )
+
+                a5, a6, a7, a8 = st.columns(4)
+
+                with a5:
+
+                    st.metric(
+                        "Trend Continuation",
+                        f"{getattr(selected_movement, 'trend_continuation_chance', 0):.2f}%",
+                    )
+
+                with a6:
+
+                    st.metric(
+                        "Trend Reversal",
+                        f"{getattr(selected_movement, 'trend_reversal_chance', 0):.2f}%",
+                    )
+
+                with a7:
+
+                    st.metric(
+                        "Breakout",
+                        f"{getattr(selected_movement, 'breakout_chance', 0):.2f}%",
+                    )
+
+                with a8:
+
+                    st.metric(
+                        "Breakdown",
+                        f"{getattr(selected_movement, 'breakdown_chance', 0):.2f}%",
+                    )
+
+                st.divider()
+
+                # ==================================================
+                # TARGET / QUALITY
+                # ==================================================
+
+                st.markdown(
+                    "##### 6.4️⃣ Target & Signal Quality"
+                )
+
+                q1, q2, q3, q4 = st.columns(4)
+
+                with q1:
+
+                    st.metric(
+                        "Target 1",
+                        f"{getattr(selected_movement, 'target1_reach_confidence', 0):.2f}%",
+                    )
+
+                with q2:
+
+                    st.metric(
+                        "Target 2",
+                        f"{getattr(selected_movement, 'target2_reach_confidence', 0):.2f}%",
+                    )
+
+                with q3:
+
+                    st.metric(
+                        "Target 3",
+                        f"{getattr(selected_movement, 'target3_reach_confidence', 0):.2f}%",
+                    )
+
+                with q4:
+
+                    st.metric(
+                        "False Signal Risk",
+                        f"{getattr(selected_movement, 'false_signal_risk', 0):.2f}%",
+                    )
+
+                q5, q6, q7, q8 = st.columns(4)
+
+                with q5:
+
+                    st.metric(
+                        "Signal Stability",
+                        f"{getattr(selected_movement, 'signal_stability', 0):.2f}%",
+                    )
+
+                with q6:
+
+                    st.metric(
+                        "Volatility",
+                        getattr(
+                            selected_movement,
+                            "volatility_state",
+                            "--",
+                        ),
+                    )
+
+                with q7:
+
+                    st.metric(
+                        "Entry Timing",
+                        getattr(
+                            selected_movement,
+                            "entry_timing",
+                            "--",
+                        ),
+                    )
+
+                with q8:
+
+                    st.metric(
+                        "Exit Timing",
+                        getattr(
+                            selected_movement,
+                            "exit_timing",
+                            "--",
+                        ),
+                    )
+
+                st.divider()
+
+                # ==================================================
+                # AI OBSERVATION
+                # ==================================================
+
+                st.markdown(
+                    "##### 6.5️⃣ AI Observation"
+                )
+
+                st.info(
+                    getattr(
+                        selected_movement,
+                        "ai_observation",
+                        "No AI observation available.",
+                    )
+                )
+
+        # ==================================================
+        # 7️⃣ FINAL PIPELINE STATUS
+        # ==================================================
+
+        st.markdown(
+            "### 7️⃣ Pipeline Status"
         )
-
-        api_key = os.getenv(
-            "MCX_COMMODITY_API_KEY",
-            "",
-        )
-
-        c1, c2 = st.columns(2)
-
-        with c1:
-
-            st.metric(
-                "MCX API URL",
-                "CONFIGURED"
-                if api_url
-                else "MISSING",
-            )
-
-        with c2:
-
-            st.metric(
-                "MCX API KEY",
-                "CONFIGURED"
-                if api_key
-                else "NOT SET",
-            )
-
-        if api_url:
-
-            st.code(
-                api_url,
-                language="text",
-            )
-
-        else:
-
-            st.error(
-                "❌ MCX_COMMODITY_API_URL is missing."
-            )
-
-        # --------------------------------------------------
-        # 5. FINAL PIPELINE STATUS
-        # --------------------------------------------------
-
-        st.markdown("### 5️⃣ Pipeline Status")
 
         if not commodity_results:
 
             st.error(
-                "❌ Commodity pipeline has produced ZERO records."
+                "❌ Commodity pipeline produced ZERO records."
             )
 
             st.write(
                 """
-                Expected flow:
+                Current expected flow:
 
-                MCX API
+                Yahoo Finance Futures
+                    ↓
+                yfinance
                     ↓
                 commodity_data_provider.py
                     ↓
                 fetch_mcx_commodities()
                     ↓
-                CommodityQuote
+                CommodityDataSource
                     ↓
                 CommodityEngine
                     ↓
-                commodity_results
+                get_all_commodities()
                     ↓
                 CommodityMovementPredictionAI
+                    ↓
+                commodity_results
                     ↓
                 Dashboard
                 """
@@ -946,6 +1551,32 @@ elif page == "🪙 Commodities":
                 f"✅ Commodity pipeline produced "
                 f"{len(commodity_results)} commodity records."
             )
+
+            if engine is not None:
+
+                try:
+
+                    final_health = engine.health_check()
+
+                    if final_health.get("healthy"):
+
+                        st.success(
+                            "✅ CommodityEngine is healthy."
+                        )
+
+                    else:
+
+                        st.warning(
+                            "⚠️ CommodityEngine has reported an "
+                            "unhealthy state. See Engine Health Details."
+                        )
+
+                except Exception as exc:
+
+                    st.warning(
+                        f"Unable to verify final engine health: "
+                        f"{type(exc).__name__}: {exc}"
+                    )
 
     # ======================================================
     # NORMAL DASHBOARD
