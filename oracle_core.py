@@ -16,6 +16,7 @@ from commodity_engine import (
     CommodityDataSource,
     CommodityMovementPredictionAI,
 )
+from commodity_data_provider import fetch_mcx_commodities
 
 class TradeOracle:
     def __init__(self):
@@ -25,7 +26,16 @@ class TradeOracle:
         self.news = NewsAnalyzer()
         self.signal = SignalEngine()
         self.movement = MovementPredictionAI()
-        self.commodity_engine = None
+        
+        commodity_source = CommodityDataSource(
+            fetch_mcx_commodities
+        )
+
+        self.commodity_engine = CommodityEngine(
+            data_source=commodity_source,
+            cache_ttl=300.0,
+        )
+
         self.commodity_ai = CommodityMovementPredictionAI()
 
     def analyze(self):
